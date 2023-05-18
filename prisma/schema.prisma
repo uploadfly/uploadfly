@@ -1,0 +1,38 @@
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+
+model User {
+id Int   @id @unique @default(autoincrement())
+email String @unique
+username String @unique
+password String
+email_verified Boolean @default(false)
+created_at DateTime @default(now())
+updated_at DateTime @updatedAt
+}
+
+
+model Fly {
+id Int   @id @unique @default(autoincrement())
+owner_id String
+storage Int @default(2048)
+used Int @default(0)
+created_at DateTime @default(now())
+updated_at DateTime @updatedAt
+}
+
+
+model ApiKey {
+  id Int @id @unique @default(autoincrement())
+  key String  @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active Boolean @default(true)
+  user_id Int
+}
+
+
+
