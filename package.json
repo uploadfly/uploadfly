@@ -1,0 +1,37 @@
+{
+  "name": "uploadfly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/index.js",
+    "dev": "nodemon index.ts",
+    "build": "tsc -p ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.15.3",
+    "prisma": "^4.11.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.11.0",
+    "@types/connect": "^3.4.35",
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/randomstring": "^1.1.8",
+    "body-parser": "^1.20.2",
+    "connect": "^3.7.0",
+    "cors": "^2.8.5",
+    "cryptr": "^6.2.0",
+    "dayjs": "^1.11.7",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.21",
+    "randomstring": "^1.2.3"
+  }
+}
