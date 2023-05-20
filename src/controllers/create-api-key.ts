@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../../prisma";
+import { generateApiKey } from "../utils/generateApiKey";
 
 const createApiKey = async (req: Request, res: Response) => {
   const { user_id, fly_id } = req.body;
@@ -24,7 +25,21 @@ const createApiKey = async (req: Request, res: Response) => {
     if (!fly) {
       return res.status(404).json({ message: "Invalid Fly id" });
     }
-  } catch (error) {}
+
+    const key = generateApiKey();
+
+    await prisma.apiKey.create({
+      data: {
+        key,
+        user_id,
+        fly_id,
+      },
+    });
+
+    return res.status(201).json({ message: "API has been created", key });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export { createApiKey };
