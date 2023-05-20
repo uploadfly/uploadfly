@@ -5,10 +5,13 @@ import { generateApiKey } from "../../utils/generateApiKey";
 const createApiKey = async (req: Request, res: Response) => {
   const { user_id, fly_id } = req.body;
 
+  if (!user_id || !fly_id)
+    return res.status(400).json({ message: "Missing user or fly id" });
+
   try {
     const user = await prisma.user.findUnique({
       where: {
-        id: user_id,
+        uuid: user_id,
       },
     });
 
@@ -18,7 +21,7 @@ const createApiKey = async (req: Request, res: Response) => {
 
     const fly = await prisma.fly.findUnique({
       where: {
-        id: fly_id,
+        uuid: fly_id,
       },
     });
 
@@ -38,6 +41,7 @@ const createApiKey = async (req: Request, res: Response) => {
 
     return res.status(201).json({ message: "API has been created", key });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
