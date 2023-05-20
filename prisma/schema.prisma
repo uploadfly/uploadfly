@@ -19,7 +19,7 @@ model user {
 
 model fly {
   id           Int      @id @unique @default(autoincrement())
-  owner_id     String
+  user_id     String
   storage      Int      @default(2048)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
@@ -32,6 +32,6 @@ model apiKey {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   active     Boolean  @default(true)
-  owner_id   String
-  fly_id String @default("")
+  user_id   String
+  fly_id String
 }
