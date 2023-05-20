@@ -8,8 +8,15 @@ const upload = async (req: Request, res: Response) => {
   const token = req.headers.authorization.split(" ")[1];
 
   try {
-    // const token = await prisma
-  } catch (error) {}
+    const apiKey = await prisma.apiKey.findUnique({
+      where: {
+        key: token,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export { upload };
