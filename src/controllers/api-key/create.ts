@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import prisma from "../../prisma";
-import { generateApiKey } from "../utils/generateApiKey";
+import prisma from "../../../prisma";
+import { generateApiKey } from "../../utils/generateApiKey";
 
 const createApiKey = async (req: Request, res: Response) => {
   const { user_id, fly_id } = req.body;
