@@ -13,6 +13,17 @@ const upload = async (req: Request, res: Response) => {
         key: token,
       },
     });
+    if (!apiKey) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized request. API key is invalid" });
+    }
+
+    if (!apiKey.active) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized request. API key is inactive" });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
