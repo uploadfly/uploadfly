@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../../prisma";
+import prisma from "../../../prisma";
 
 const upload = async (req: Request, res: Response) => {
   if (!req.headers.authorization) {
