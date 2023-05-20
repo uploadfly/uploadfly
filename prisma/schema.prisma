@@ -1,39 +1,36 @@
 datasource db {
   provider = "mysql"
   url = env("DATABASE_URL")
-  relationMode = "prisma"
+  }
+
+generator client {
+  provider = "prisma-client-js"
 }
 
-
-model User {
-id Int   @id @unique @default(autoincrement())
-email String @unique
-username String @unique
-password String
-email_verified Boolean @default(false)
-created_at DateTime @default(now())
-updated_at DateTime @updatedAt
+model user {
+  id             Int      @id @unique @default(autoincrement())
+  email          String   @unique
+  username       String   @unique 
+  password       String
+  email_verified Boolean  @default(false)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 }
 
-
-model Fly {
-id Int   @id @unique @default(autoincrement())
-owner_id String
-storage Int @default(2048)
-used Int @default(0)
-created_at DateTime @default(now())
-updated_at DateTime @updatedAt
+model fly {
+  id           Int      @id @unique @default(autoincrement())
+  owner_id     String
+  storage      Int      @default(2048)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  used_storage Int      @default(0)
 }
 
-
-model ApiKey {
-  id Int @id @unique @default(autoincrement())
-  key String  @unique
+model apiKey {
+  id         Int      @id @unique @default(autoincrement())
+  key        String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  active Boolean @default(true)
-  user_id Int
+  active     Boolean  @default(true)
+  owner_id   String
 }
-
-
-
