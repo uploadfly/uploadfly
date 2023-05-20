@@ -15,15 +15,17 @@ model user {
   email_verified Boolean  @default(false)
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
+  uuid           String   @unique @default(uuid())
 }
 
 model fly {
   id           Int      @id @unique @default(autoincrement())
-  user_id     String
+  user_id      String
   storage      Int      @default(2048)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   used_storage Int      @default(0)
+  uuid         String   @unique @default(uuid())
 }
 
 model apiKey {
@@ -32,6 +34,7 @@ model apiKey {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   active     Boolean  @default(true)
-  user_id   String
-  fly_id String
+  user_id    String
+  fly_id     String
+  uuid       String   @unique @default(uuid())
 }
