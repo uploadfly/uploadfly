@@ -33,4 +33,5 @@ model apiKey {
   updated_at DateTime @updatedAt
   active     Boolean  @default(true)
   owner_id   String
+  fly_id String @default("")
 }
