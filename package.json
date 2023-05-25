@@ -26,6 +26,7 @@
     "@types/express": "^4.17.17",
     "@types/randomstring": "^1.1.8",
     "body-parser": "^1.20.2",
+    "boring-name-generator": "^1.0.3",
     "connect": "^3.7.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -34,7 +35,6 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "nodemon": "^2.0.21",
-    "project-namer": "^1.0.0",
     "randomstring": "^1.2.3",
     "uuid": "^9.0.0"
   }

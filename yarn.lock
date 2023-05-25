@@ -249,6 +249,14 @@ body-parser@1.20.1:
     type-is "~1.6.18"
     unpipe "1.0.0"
 
+boring-name-generator@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/boring-name-generator/-/boring-name-generator-1.0.3.tgz"
+  integrity sha512-1wEo1pNahY9js7Vkp1RQa/VWdWrXYJnVAmsHV3Pw/0YzspjABLw7dcekjukOMTIYWr8ir/aG0GX1eoEkYhpnUg==
+  dependencies:
+    commander "^6.1.0"
+    lodash "^4.17.20"
+
 brace-expansion@^1.1.7:
   version "1.1.11"
   resolved "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz"
@@ -292,7 +300,7 @@ chokidar@^3.5.2:
   optionalDependencies:
     fsevents "~2.3.2"
 
-commander@^6.2.0:
+commander@^6.1.0:
   version "6.2.1"
   resolved "https://registry.npmjs.org/commander/-/commander-6.2.1.tgz"
   integrity sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==
@@ -734,14 +742,6 @@ prisma@*, prisma@^4.11.0:
   integrity sha512-z6hxzTMYqT9SIKlzD08dhzsLUpxjFKKsLpp5/kBDnSqiOjtUyyl/dC5tzxLcOa3jkEHQ8+RpB/fE3w8bgNP51g==
   dependencies:
     "@prisma/engines" "4.14.1"
-
-project-namer@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/project-namer/-/project-namer-1.0.0.tgz"
-  integrity sha512-BlbI2+W4VHhC3HWCvIzyqIxMbKLT6grN3ZMSVfznvZcs6gpcHtVAcvxL//NQE90aQWJg/3NuPXuGTAQxaZrBxw==
-  dependencies:
-    commander "^6.2.0"
-    lodash "^4.17.20"
 
 proxy-addr@~2.0.7:
   version "2.0.7"
