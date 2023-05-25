@@ -15,7 +15,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api-key", apiKeyRouter);
-app.use("fly", flyRouter);
+app.use("/fly", flyRouter);
 
 const PORT = process.env.PORT || 2001;
 
