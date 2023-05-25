@@ -1,22 +1,29 @@
-datasource db {
-  provider = "mysql"
-  url = env("DATABASE_URL")
-  }
-
 generator client {
   provider = "prisma-client-js"
 }
 
-model user {
-  id             Int      @id @unique @default(autoincrement())
-  email          String   @unique
-  username       String   @unique 
-  password       String
-  email_verified Boolean  @default(false)
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-  uuid           String   @unique @default(uuid())
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
+
+model user {
+  id                   Int       @id @unique @default(autoincrement())
+  email                String    @unique
+  username             String    @unique
+  password             String?   @default("")
+  otp                  String?
+  otp_expiry           DateTime?
+  email_verified       Boolean   @default(false)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+  uuid                 String    @unique @default(uuid())
+  refresh_token        String?
+  refresh_token_expiry DateTime?
+  auth_method          String?
+  github_id            Int?
+}
+
 
 model fly {
   id           Int      @id @unique @default(autoincrement())
@@ -26,6 +33,7 @@ model fly {
   updated_at   DateTime @updatedAt
   used_storage Int      @default(0)
   uuid         String   @unique @default(uuid())
+  name         String
 }
 
 model apiKey {
