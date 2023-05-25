@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { apiKeyRouter } from "./src/routes/api-key";
+import { flyRouter } from "./src/routes/fly";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api-key", apiKeyRouter);
+app.use("fly", flyRouter);
 
 const PORT = process.env.PORT || 2001;
 
