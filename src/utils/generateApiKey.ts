@@ -1,9 +1,8 @@
-import uuid from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 const generateApiKey = () => {
-  const uuidv4 = uuid.v4;
-
   const apiKey = uuidv4();
+
   return apiKey;
 };
 
