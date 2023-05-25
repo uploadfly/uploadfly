@@ -34,6 +34,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "nodemon": "^2.0.21",
+    "project-namer": "^1.0.0",
     "randomstring": "^1.2.3",
     "uuid": "^9.0.0"
   }
