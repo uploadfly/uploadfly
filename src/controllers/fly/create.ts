@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../../../prisma";
+import generate from "boring-name-generator";
 
 const createFly = async (req: Request, res: Response) => {
   const { user_id, name } = req.body;
