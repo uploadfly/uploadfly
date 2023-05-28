@@ -77,11 +77,13 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       return;
     }
 
-    uploadFileToS3(file, fly?.uuid as string, filename)
+    uploadFileToS3(file, fly?.public_key as string, filename)
       .then((s3Url) => {
         res.status(200).json({
           fileUrl: s3Url,
           fileSize: filesize(file.size).human("si"),
+          type: file.mimetype,
+          name: file.originalname,
         });
         return;
       })
