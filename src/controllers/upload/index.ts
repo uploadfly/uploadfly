@@ -1,5 +1,6 @@
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
+import { generateRandomKey } from "../../utils/generateRandomKey";
 dotenv.config();
 
 const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION } = process.env;
@@ -12,13 +13,17 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-const uploadFileToS3 = (file: any, fly_id: string, filename: string) => {
+const getFileExtension = (filename: string) => {
+  return filename.split(".").pop();
+};
+
+const uploadFileToS3 = (file: any, public_key: string, filename: string) => {
   return new Promise((resolve, reject) => {
     const params = {
       Bucket: "uploadfly",
-      Key:
-        `${fly_id}/${filename + "." + file.mimetype.split("/")[1]}` ||
-        file.originalname,
+      Key: `${public_key}/${filename}_${generateRandomKey(
+        3
+      )}.${getFileExtension(file.originalname || "")}`,
       Body: file.buffer,
     };
 
