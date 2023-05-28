@@ -3,6 +3,7 @@ import prisma from "../../../prisma";
 import generate from "boring-name-generator";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { generateRandomKey } from "../../utils/generateRandomKey";
 dotenv.config();
 
 const createFly = async (req: Request, res: Response) => {
@@ -46,6 +47,7 @@ const createFly = async (req: Request, res: Response) => {
       data: {
         user_id,
         name: name || generate().dashed,
+        public_key: generateRandomKey(6),
       },
     });
 
