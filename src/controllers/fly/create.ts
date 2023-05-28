@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import prisma from "../../../prisma";
 import generate from "boring-name-generator";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 const createFly = async (req: Request, res: Response) => {
   try {
@@ -18,7 +20,8 @@ const createFly = async (req: Request, res: Response) => {
 
     const user_id = decoded.uuid;
 
-    if (!user_id) return res.status(400).json({ message: "Missing user id" });
+    if (!user_id)
+      return res.status(400).json({ message: "Missing user id in payload" });
     const isUser = await prisma.user.findUnique({
       where: {
         uuid: user_id,
