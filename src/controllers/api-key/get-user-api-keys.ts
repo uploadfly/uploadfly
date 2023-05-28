@@ -18,10 +18,13 @@ const getUserApiKeys = async (req: Request, res: Response) => {
       where: {
         user_id: uuid,
       },
+      select: {
+        key: true,
+      },
     });
-
     res.json(apiKeys);
   } catch (error) {
+    console.log(error);
     res.sendStatus(500);
   }
 };
