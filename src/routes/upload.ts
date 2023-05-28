@@ -37,6 +37,14 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       return;
     }
     const file = req.file;
+    const filename = req.body.filename;
+
+    const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
+
+    if (filename && !filenameRegex.test(filename)) {
+      res.status(400).json({ message: "Invalid filename" });
+      return;
+    }
     const fileSize = parseInt(filesize(file.size).to("MB"));
 
     if (fileSize > 300) {
@@ -49,6 +57,11 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
         uuid: apiKey.fly_id,
       },
     });
+
+    if (!fly) {
+      res.status(404).json({ message: "Fly not found" });
+      return;
+    }
 
     const flyStorage = fly?.storage as number;
     const flyUsedStorage = fly?.used_storage as number;
@@ -64,16 +77,7 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       return;
     }
 
-    await prisma.fly.update({
-      where: {
-        uuid: apiKey.fly_id,
-      },
-      data: {
-        used_storage: flyUsedStorage + fileSize,
-      },
-    });
-
-    uploadFileToS3(file)
+    uploadFileToS3(file, fly?.uuid as string, filename)
       .then((s3Url) => {
         res.status(200).json({
           fileUrl: s3Url,
@@ -85,6 +89,14 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
         console.error(err);
         res.status(500).send("Error uploading file to S3");
       });
+    await prisma.fly.update({
+      where: {
+        uuid: apiKey.fly_id,
+      },
+      data: {
+        used_storage: flyUsedStorage + fileSize,
+      },
+    });
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
