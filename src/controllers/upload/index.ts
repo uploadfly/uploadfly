@@ -12,11 +12,13 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-const uploadFileToS3 = (file: any) => {
+const uploadFileToS3 = (file: any, fly_id: string, filename: string) => {
   return new Promise((resolve, reject) => {
     const params = {
       Bucket: "uploadfly",
-      Key: file.originalname,
+      Key:
+        `${fly_id}/${filename + "." + file.mimetype.split("/")[1]}` ||
+        file.originalname,
       Body: file.buffer,
     };
 
