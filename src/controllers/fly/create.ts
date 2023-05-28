@@ -1,13 +1,24 @@
 import { Request, Response } from "express";
 import prisma from "../../../prisma";
 import generate from "boring-name-generator";
+import jwt from "jsonwebtoken";
 
 const createFly = async (req: Request, res: Response) => {
-  const { user_id, name } = req.body;
-
-  if (!user_id) return res.status(400).json({ message: "Missing user id" });
-
   try {
+    const { name } = req.body;
+    const token = req.cookies.access_token;
+
+    if (!token) {
+      return res.status(400).json({ message: "Token is missing in request" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as {
+      uuid: string;
+    };
+
+    const user_id = decoded.uuid;
+
+    if (!user_id) return res.status(400).json({ message: "Missing user id" });
     const isUser = await prisma.user.findUnique({
       where: {
         uuid: user_id,
@@ -37,6 +48,7 @@ const createFly = async (req: Request, res: Response) => {
 
     res.status(201).json({ fly: fly.uuid });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
