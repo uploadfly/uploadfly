@@ -74,13 +74,17 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
     });
 
     uploadFileToS3(file)
-      .then((s3Url) => {})
+      .then((s3Url) => {
+        res.status(200).json({
+          fileUrl: s3Url,
+          fileSize: filesize(file.size).human("si"),
+        });
+        return;
+      })
       .catch((err) => {
         console.error(err);
         res.status(500).send("Error uploading file to S3");
       });
-
-    res.send("File uploaded to S3");
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
