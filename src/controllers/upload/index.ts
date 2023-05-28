@@ -21,9 +21,11 @@ const uploadFileToS3 = (file: any, public_key: string, filename: string) => {
   return new Promise((resolve, reject) => {
     const params = {
       Bucket: "uploadfly",
-      Key: `${public_key}/${filename}_${generateRandomKey(
-        3
-      )}.${getFileExtension(file.originalname || "txt")}`,
+      Key: `${public_key}/${
+        filename || file.originalname.split(".")[0]
+      }_${generateRandomKey(3)}.${getFileExtension(
+        file.originalname || "txt"
+      )}`,
       Body: file.buffer,
     };
 
