@@ -1,11 +1,18 @@
 import { Request, Response } from "express";
 import prisma from "../../../prisma";
+import AWS from "aws-sdk";
 
 const upload = async (req: Request, res: Response) => {
   if (!req.headers.authorization) {
     return res.status(401).json({ message: "Unauthorized request" });
   }
   const token = req.headers.authorization.split(" ")[1];
+
+  AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+  });
 
   try {
     const apiKey = await prisma.apiKey.findUnique({
@@ -24,6 +31,7 @@ const upload = async (req: Request, res: Response) => {
         .status(401)
         .json({ message: "Unauthorized request. API key is inactive" });
     }
+
     res.send("Hey babes");
   } catch (error) {
     console.log(error);
