@@ -1,14 +1,26 @@
 import { Request, Response } from "express";
 import prisma from "../../../prisma";
 import { generateApiKey } from "../../utils/generateApiKey";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 const createApiKey = async (req: Request, res: Response) => {
-  const { user_id, fly_id } = req.body;
-
-  if (!user_id || !fly_id)
-    return res.status(400).json({ message: "Missing user or fly id" });
-
   try {
+    const { fly_id } = req.body;
+
+    const token = req.cookies.access_token;
+    if (!token) {
+      return res.status(400).json({ message: "Token is missing in request" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as {
+      uuid: string;
+    };
+    const user_id = decoded.uuid;
+
+    if (!user_id || !fly_id)
+      return res.status(400).json({ message: "Missing user or fly id" });
     const user = await prisma.user.findUnique({
       where: {
         uuid: user_id,
