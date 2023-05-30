@@ -20,7 +20,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("File uploads that fly 🪁");
 });
 
-app.use("/", uploadRouter);
+app.use("/upload", uploadRouter);
 
 const PORT = process.env.PORT || 2001;
 
