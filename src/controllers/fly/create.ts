@@ -8,7 +8,7 @@ dotenv.config();
 
 const createFly = async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const { name } = req.body as { name: string };
     const token = req.cookies.access_token;
 
     if (!token) {
@@ -46,12 +46,17 @@ const createFly = async (req: Request, res: Response) => {
     const fly = await prisma.fly.create({
       data: {
         user_id,
-        name: name || generate().dashed,
+        name: name.toLowerCase().replaceAll(" ", "-") || generate().dashed,
         public_key: generateRandomKey(6),
       },
     });
 
-    res.status(201).json({ fly: fly.uuid });
+    res
+      .status(201)
+      .json({
+        message: "Fly created",
+        redirect: `/${isUser.username}/${fly.name}`,
+      });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
