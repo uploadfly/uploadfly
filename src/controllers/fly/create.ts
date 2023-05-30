@@ -51,12 +51,10 @@ const createFly = async (req: Request, res: Response) => {
       },
     });
 
-    res
-      .status(201)
-      .json({
-        message: "Fly created",
-        redirect: `/${isUser.username}/${fly.name}`,
-      });
+    res.status(201).json({
+      message: "Fly created",
+      redirect: `/${isUser.username}/${fly.name}`,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
