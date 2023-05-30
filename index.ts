@@ -1,10 +1,8 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { apiKeyRouter } from "./src/routes/api-key";
-import { flyRouter } from "./src/routes/fly";
 import cookieParser from "cookie-parser";
-import { uploadRouter } from "./src/routes/upload";
+import { uploadRouter } from "./src/routes";
 
 const app = express();
 
@@ -22,9 +20,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("File uploads that fly 🪁");
 });
 
-app.use("/api-key", apiKeyRouter);
-app.use("/fly", flyRouter);
-app.use("/upload", uploadRouter);
+app.use("/", uploadRouter);
 
 const PORT = process.env.PORT || 2001;
 
