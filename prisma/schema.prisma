@@ -24,7 +24,6 @@ model user {
   github_id            Int?
 }
 
-
 model fly {
   id           Int      @id @unique @default(autoincrement())
   user_id      String
@@ -39,30 +38,31 @@ model fly {
 
 model apiKey {
   id         Int      @id @unique @default(autoincrement())
-  key        String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   active     Boolean  @default(true)
   user_id    String
   fly_id     String
   uuid       String   @unique @default(uuid())
+  public_key String   @unique
+  secret_key String   @unique
 }
 
 model folder {
-  id Int @id @unique @default(autoincrement())
-  name String
-  parent_folder_id String @default("")
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id               Int      @id @unique @default(autoincrement())
+  name             String
+  parent_folder_id String   @default("")
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
 }
 
 model file {
-  id Int @id @unique @default(autoincrement())
-  name String
-  url String
+  id               Int      @id @unique @default(autoincrement())
+  name             String
+  url              String
   parent_folder_id String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  type String
-  uploaded_via String
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  type             String
+  uploaded_via     String
 }
