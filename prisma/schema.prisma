@@ -47,3 +47,25 @@ model apiKey {
   fly_id     String
   uuid       String   @unique @default(uuid())
 }
+
+
+
+model folder {
+  id Int @id @unique @default(autoincrement())
+  name String
+  parent_folder_id String @default("")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+
+model file {
+  id Int @id @unique @default(autoincrement())
+  name String
+  url String
+  parent_folder_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  type String
+  uploaded_via String
+}
