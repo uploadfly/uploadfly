@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\akink\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add @aws-sdk/client-s3
+  C:\Program Files\nodejs\node.exe C:\Users\akink\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add --dev prisma@latest │
 
 PATH: 
   C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Go\bin;C:\Users\akink\AppData\Local\Programs\Python\Python311\Scripts\;C:\Users\akink\AppData\Local\Programs\Python\Python311\;C:\Users\akink\.cargo\bin;C:\Users\akink\AppData\Local\Microsoft\WindowsApps;;C:\Users\akink\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\akink\AppData\Roaming\npm;C:\Users\akink\go\bin;C:\Users\akink\AppData\Local\Programs\Hyper\resources\bin
@@ -14,7 +14,15 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: EPERM: operation not permitted, unlink 'C:\Users\akink\Projects\uploadfly\api\node_modules\prisma\engines\d9a4c5988f480fa576d43970d5a23641aa77bc9c\query_engine-windows.dll.node'
+  TypeError [ERR_UNESCAPED_CHARACTERS]: https://registry.yarnpkg.com/│: Request path contains unescaped characters
+      at new NodeError (node:internal/errors:399:5)
+      at new ClientRequest (node:_http_client:184:13)
+      at Object.request (node:https:360:10)
+      at module.exports.Request.start (C:\Users\akink\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141452:32)
+      at module.exports.Request.end (C:\Users\akink\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:142211:10)
+      at end (C:\Users\akink\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141265:14)
+      at Immediate.<anonymous> (C:\Users\akink\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141279:7)
+      at process.processImmediate (node:internal/timers:476:21)
 
 npm manifest: 
   {
@@ -62,7 +70,7 @@ npm manifest:
       "file-size": "^1.0.0",
       "jsonwebtoken": "^9.0.0",
       "multer": "^1.4.5-lts.1",
-      "nodemon": "^2.0.21",
+      "nodemon": "^2.0.22",
       "randomstring": "^1.2.3",
       "uuid": "^9.0.0"
     }

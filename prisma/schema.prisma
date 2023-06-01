@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id                   Int       @id @unique @default(autoincrement())
+  email                String    @unique
+  username             String    @unique
+  password             String?   @default("")
+  otp                  String?
+  otp_expiry           DateTime?
+  email_verified       Boolean   @default(false)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+  uuid                 String    @unique @default(uuid())
+  refresh_token        String?
+  refresh_token_expiry DateTime?
+  auth_method          String?
+  github_id            Int?
+}
+
+
+model fly {
+  id           Int      @id @unique @default(autoincrement())
+  user_id      String
+  storage      Int      @default(2048)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  used_storage Int      @default(0)
+  uuid         String   @unique @default(uuid())
+  name         String
+  public_key   String
+}
+
+model apiKey {
+  id         Int      @id @unique @default(autoincrement())
+  key        String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active     Boolean  @default(true)
+  user_id    String
+  fly_id     String
+  uuid       String   @unique @default(uuid())
+}
+
+model folder {
+  id Int @id @unique @default(autoincrement())
+  name String
+  parent_folder_id String @default("")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model file {
+  id Int @id @unique @default(autoincrement())
+  name String
+  url String
+  parent_folder_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  type String
+  uploaded_via String
+}
