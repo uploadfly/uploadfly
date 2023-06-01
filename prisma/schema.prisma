@@ -48,8 +48,6 @@ model apiKey {
   uuid       String   @unique @default(uuid())
 }
 
-
-
 model folder {
   id Int @id @unique @default(autoincrement())
   name String
@@ -57,7 +55,6 @@ model folder {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
-
 
 model file {
   id Int @id @unique @default(autoincrement())
