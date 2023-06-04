@@ -127,7 +127,7 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       });
     } catch (err) {
       console.error(err);
-      res.status(500).send("Error uploading file to S3");
+      res.status(500).send("File upload failed");
     }
     await prisma.fly.update({
       where: {
