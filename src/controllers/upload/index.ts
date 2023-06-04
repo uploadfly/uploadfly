@@ -38,7 +38,7 @@ const uploadFileToS3 = (
       if (err) {
         reject(err);
       } else {
-        resolve(`${process.env.AWS_CLOUDFRONT_URL}/${params.Key}`);
+        resolve(`${params.Key}`);
       }
     });
   });
