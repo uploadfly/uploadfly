@@ -34,13 +34,11 @@ const uploadFileToS3 = (
       Body: file.buffer,
     };
 
-    s3.upload(params, (err: any, data: { Location: unknown }) => {
+    s3.upload(params, (err: any) => {
       if (err) {
-        console.error(err);
         reject(err);
       } else {
-        console.log("File uploaded to S3:", data.Location);
-        resolve(data.Location);
+        resolve(`${process.env.AWS_CLOUDFRONT_URL}/${params.Key}`);
       }
     });
   });
