@@ -121,6 +121,7 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
           parent_folder_id: "",
           type: file.mimetype,
           size: filesize(file.size).human("si"),
+          // fly_id: apiKey.fly_id,
         },
       });
       res.status(200).json({
