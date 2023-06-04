@@ -104,7 +104,7 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
     }
 
     try {
-      const s3Url = await uploadFileToS3(
+      const filePath = await uploadFileToS3(
         file,
         fly?.public_key as string,
         filename,
@@ -115,7 +115,8 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
           name:
             filename ||
             `${file.originalname.replaceAll(".", "")}_${generateRandomKey(4)}`,
-          url: s3Url as string,
+          url: `${process.env.AWS_CLOUDFRONT_URL}/${filePath}` as string,
+          path: filePath as string,
           uploaded_via: "REST API",
           parent_folder_id: "",
           type: file.mimetype,
