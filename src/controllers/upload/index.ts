@@ -17,11 +17,16 @@ const getFileExtension = (filename: string) => {
   return filename.split(".").pop();
 };
 
-const uploadFileToS3 = (file: any, public_key: string, filename: string) => {
+const uploadFileToS3 = (
+  file: any,
+  public_key: string,
+  filename: string,
+  route?: string
+) => {
   return new Promise((resolve, reject) => {
     const params = {
       Bucket: "uploadfly",
-      Key: `${public_key}/${
+      Key: `${public_key}${route || ""}/${
         filename || file.originalname.split(".")[0]
       }_${generateRandomKey(3)}.${getFileExtension(
         file.originalname || "txt"
