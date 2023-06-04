@@ -67,4 +67,5 @@ model file {
   type             String
   uploaded_via     String
   size             String    @default("")
+  path             String
 }
