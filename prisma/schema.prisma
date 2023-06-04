@@ -51,9 +51,10 @@ model apiKey {
 model folder {
   id               Int      @id @unique @default(autoincrement())
   name             String
-  parent_folder_id String   @default("")
+  parent_folder_id String  @default("")
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
+  uuid             String   @default(uuid())
 }
 
 model file {
@@ -65,4 +66,5 @@ model file {
   updated_at       DateTime @updatedAt
   type             String
   uploaded_via     String
+  size             String    @default("")
 }
