@@ -67,7 +67,7 @@ model file {
   updated_at       DateTime @updatedAt
   type             String
   uploaded_via     String
-  size             String    @default("")
+  size             Int
   path             String
   fly_id           String
 }
