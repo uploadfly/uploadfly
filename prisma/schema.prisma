@@ -27,7 +27,7 @@ model user {
 model fly {
   id           Int      @id @unique @default(autoincrement())
   user_id      String
-  storage      Int      @default(2048)
+  storage      Int      @default(2147483648)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   used_storage Int      @default(0)
