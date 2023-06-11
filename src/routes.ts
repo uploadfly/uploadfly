@@ -71,9 +71,9 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       res.status(400).json({ message: "Invalid filename" });
       return;
     }
-    const fileSize = parseInt(filesize(file.size).to("MB"));
+    const fileSize = file.size;
 
-    if (fileSize > 300) {
+    if (fileSize > 314572800) {
       res.status(400).send("Max file size is 300MB");
       return;
     }
@@ -120,7 +120,7 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
           uploaded_via: "REST API",
           parent_folder_id: "",
           type: file.mimetype,
-          size: filesize(file.size).human("si"),
+          size: fileSize,
           fly_id: apiKey.fly_id,
         },
       });
