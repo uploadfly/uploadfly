@@ -24,7 +24,7 @@ model user {
 
 model fly {
   id           Int      @id @unique @default(autoincrement())
-  user_id      Int
+  user_id      String
   storage      BigInt   @default(2147483648)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
@@ -61,7 +61,7 @@ model file {
   id               Int      @id @unique @default(autoincrement())
   name             String
   url              String
-  parent_folder_id Int
+  parent_folder_id String
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
   type             String
