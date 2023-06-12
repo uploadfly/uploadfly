@@ -18,8 +18,6 @@ model user {
   created_at           DateTime  @default(now())
   updated_at           DateTime  @updatedAt
   uuid                 String    @unique @default(uuid())
-  refresh_token        String?
-  refresh_token_expiry DateTime?
   auth_method          String?
   github_id            Int?
 }
