@@ -62,12 +62,13 @@ model file {
   id               Int      @id @unique @default(autoincrement())
   name             String
   url              String
-  parent_folder_id String
+  parent_folder_id Int
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
   type             String
   uploaded_via     String
-  size             Int
+  size             BigInt
   path             String
   fly_id           String
 }
+
