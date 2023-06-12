@@ -60,7 +60,7 @@ model folder {
 model file {
   id               Int      @id @unique @default(autoincrement())
   name             String
-  url              String
+  url             String
   parent_folder_id String
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
