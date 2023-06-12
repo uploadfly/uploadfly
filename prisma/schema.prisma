@@ -26,15 +26,16 @@ model user {
 
 model fly {
   id           Int      @id @unique @default(autoincrement())
-  user_id      String
-  storage      Int      @default(2147483648)
+  user_id      Int
+  storage      BigInt   @default(2147483648)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
-  used_storage Int      @default(0)
+  used_storage BigInt   @default(0)
   uuid         String   @unique @default(uuid())
   name         String
   public_key   String
 }
+
 
 model apiKey {
   id         Int      @id @unique @default(autoincrement())
