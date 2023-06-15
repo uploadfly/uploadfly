@@ -89,8 +89,8 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       return;
     }
 
-    const flyStorage = fly?.storage;
-    const flyUsedStorage = fly?.used_storage;
+    const flyStorage = Number(fly?.storage);
+    const flyUsedStorage = Number(fly?.used_storage);
 
     console.log({
       fileSize,
