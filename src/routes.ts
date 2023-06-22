@@ -92,12 +92,6 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
     const flyStorage = Number(fly?.storage);
     const flyUsedStorage = Number(fly?.used_storage);
 
-    console.log({
-      fileSize,
-      flyStorage,
-      flyUsedStorage,
-    });
-
     if (flyUsedStorage + fileSize > flyStorage) {
       res.status(403).json({ message: "Storage limit exceeded" });
       return;
@@ -125,7 +119,11 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
         },
       });
       res.status(200).json({
-        ...newFile,
+        url: newFile?.url,
+        path: newFile?.path,
+        name: newFile?.name,
+        type: newFile?.type,
+        size: Number(newFile?.size),
       });
     } catch (err) {
       console.error(err);
