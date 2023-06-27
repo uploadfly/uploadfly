@@ -28,7 +28,7 @@ const uploadFileToS3 = (
       Bucket: "uploadfly",
       Key: `${public_key}${route || ""}/${
         filename || file.originalname.split(".")[0]
-      }_${generateRandomKey(3)}.${getFileExtension(
+      }-${generateRandomKey(3)}.${getFileExtension(
         file.originalname || "txt"
       )}`,
       Body: file.buffer,
