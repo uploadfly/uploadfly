@@ -63,12 +63,20 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       return;
     }
     const file = req.file;
-    const filename = req.body.filename;
+    const generatedFilename = `${file.originalname
+      .replaceAll(".", "")
+      .replaceAll(" ", "-")}-${generateRandomKey(6)}`;
+    const filename = req.body.filename || generatedFilename;
 
     const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
 
     if (filename && !filenameRegex.test(filename)) {
-      res.status(400).json({ message: "Invalid filename" });
+      res
+        .status(400)
+        .json({
+          message:
+            "Filename cannot contain spaces and special characters (excluding dashes and underscores)",
+        });
       return;
     }
     const fileSize = file.size;
@@ -101,14 +109,13 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       const filePath = await uploadFileToS3(
         file,
         fly?.public_key as string,
-        filename,
+        `${filename}-${generateRandomKey(6)}`,
         req.body.route
       );
+
       const newFile = await prisma.file.create({
         data: {
-          name:
-            filename ||
-            `${file.originalname.replaceAll(".", "")}_${generateRandomKey(4)}`,
+          name: filename,
           url: `${process.env.AWS_CLOUDFRONT_URL}/${filePath}` as string,
           path: filePath as string,
           uploaded_via: "REST API",
@@ -121,9 +128,8 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       res.status(200).json({
         url: newFile?.url,
         path: newFile?.path,
-        name: newFile?.name,
         type: newFile?.type,
-        size: Number(newFile?.size),
+        size: filesize(fileSize).human("si"),
       });
     } catch (err) {
       console.error(err);
