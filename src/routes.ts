@@ -15,20 +15,6 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized request" });
     }
 
-    const filePath = req.body.route.split("/");
-
-    console.log(filePath);
-
-    if (!filePath.length) {
-      return res.status(400).json({ message: "Invalid route" });
-    }
-
-    if (filePath.length > 6) {
-      return res
-        .status(400)
-        .json({ message: "Too many route levels, maximum is 6" });
-    }
-
     const token = req.headers.authorization.split(" ")[1];
     console.log(token);
 
@@ -59,7 +45,9 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
     }
 
     if (!req.file) {
-      res.status(400).send("No file uploaded");
+      res.status(400).json({
+        message: "No file uploaded",
+      });
       return;
     }
     const file = req.file;
@@ -71,12 +59,10 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
     const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
 
     if (filename && !filenameRegex.test(filename)) {
-      res
-        .status(400)
-        .json({
-          message:
-            "Filename cannot contain spaces and special characters (excluding dashes and underscores)",
-        });
+      res.status(400).json({
+        message:
+          "Filename cannot contain spaces and special characters (excluding dashes and underscores)",
+      });
       return;
     }
     const fileSize = file.size;
