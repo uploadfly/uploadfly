@@ -44,39 +44,6 @@ const uploadFileToS3 = (
 
 const uploadFile = async (req: Request, res: Response) => {
   try {
-    if (!req.headers.authorization) {
-      return res.status(401).json({ message: "Unauthorized request" });
-    }
-
-    const token = req.headers.authorization.split(" ")[1];
-    console.log(token);
-
-    const apiKeyByPublicKey = await prisma.apiKey.findUnique({
-      where: {
-        public_key: token,
-      },
-    });
-
-    const apiKeyBySecretKey = await prisma.apiKey.findUnique({
-      where: {
-        secret_key: token,
-      },
-    });
-
-    const apiKey = apiKeyByPublicKey || apiKeyBySecretKey;
-
-    if (!apiKey) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized request. API key is invalid" });
-    }
-
-    if (!apiKey.active) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized request. API key is inactive" });
-    }
-
     if (!req.file) {
       res.status(400).json({
         message: "No file uploaded",
