@@ -3,14 +3,14 @@ import { IRequest } from "../interfaces";
 import prisma from "../../prisma";
 
 const deleteFile = async (req: IRequest, res: Response) => {
-  const filename = req.body.filename;
+  const fileUrl = req.body.file_url;
 
-  if (!filename)
-    return res.status(400).json({ message: "Filename is missing in request" });
+  if (!fileUrl)
+    return res.status(400).json({ message: "File URL is missing in request" });
 
   const file = await prisma.file.findFirst({
     where: {
-      name: filename,
+      url: fileUrl,
     },
   });
 
@@ -22,6 +22,11 @@ const deleteFile = async (req: IRequest, res: Response) => {
   //     },
   //   });
 
-  res.status(200).json({ message: "File deleted", file });
+  const fileWithSizeAsNumber = {
+    ...file,
+    size: Number(file.size),
+  };
+
+  res.status(200).json({ message: "File deleted", file: fileWithSizeAsNumber });
 };
 export { deleteFile };
