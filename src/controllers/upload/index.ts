@@ -1,30 +1,35 @@
-import AWS from "aws-sdk";
+import {
+  S3Client,
+  PutObjectCommand,
+  PutObjectCommandInput,
+} from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
 import { generateRandomKey } from "../../utils/generateRandomKey";
+
 dotenv.config();
 
 const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION } = process.env;
 
-AWS.config.update({
-  accessKeyId: AWS_ACCESS_KEY_ID,
-  secretAccessKey: AWS_SECRET_ACCESS_KEY,
+const s3Client = new S3Client({
   region: AWS_REGION,
+  credentials: {
+    accessKeyId: AWS_ACCESS_KEY_ID as string,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY as string,
+  },
 });
 
-const s3 = new AWS.S3();
-
-const getFileExtension = (filename: string) => {
-  return filename.split(".").pop();
+const getFileExtension = (filename: string): string => {
+  return filename.split(".").pop()!;
 };
 
 const uploadFileToS3 = (
-  file: any,
+  file: Express.Multer.File,
   public_key: string,
   filename: string,
   route?: string
-) => {
+): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const params = {
+    const params: PutObjectCommandInput = {
       Bucket: "uploadfly",
       Key: `${public_key}${route || ""}/${
         filename || file.originalname.split(".")[0]
@@ -34,13 +39,16 @@ const uploadFileToS3 = (
       Body: file.buffer,
     };
 
-    s3.upload(params, (err: any) => {
-      if (err) {
-        reject(err);
-      } else {
+    const command = new PutObjectCommand(params);
+
+    s3Client
+      .send(command)
+      .then(() => {
         resolve(`${params.Key}`);
-      }
-    });
+      })
+      .catch((err: any) => {
+        reject(err);
+      });
   });
 };
 
