@@ -1,25 +1,12 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  PutObjectCommandInput,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
 import prisma from "../../../prisma";
 import filesize from "file-size";
 import { generateRandomKey } from "../../utils/generateRandomKey";
+import { s3Client } from "../../configs/s3";
 
 dotenv.config();
-
-const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION } = process.env;
-
-const s3Client = new S3Client({
-  region: AWS_REGION,
-  credentials: {
-    accessKeyId: AWS_ACCESS_KEY_ID as string,
-    secretAccessKey: AWS_SECRET_ACCESS_KEY as string,
-  },
-});
 
 const getFileExtension = (filename: string): string => {
   return filename.split(".").pop()!;
