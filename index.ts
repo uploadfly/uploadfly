@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import { uploadRouter } from "./src/routes";
+import { authenticateApiKey } from "./src/middlewares/authenticateApiKey";
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("File uploads that fly 🪁");
 });
 
-app.use("/", uploadRouter);
+app.use("/", authenticateApiKey, uploadRouter);
 
 const PORT = process.env.PORT || 2001;
 
