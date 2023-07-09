@@ -35,7 +35,7 @@ const authenticateApiKey = async (
         .status(401)
         .json({ message: "Unauthorized request. API key is invalid" });
     }
-    req.apiKey = `${apiKey}`;
+    req.apiKey = apiKey;
     next();
   } catch (error) {
     console.log(error);
