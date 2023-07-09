@@ -116,6 +116,7 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
         path: newFile?.path,
         type: newFile?.type,
         size: filesize(fileSize).human("si"),
+        name: newFile?.name,
       });
     } catch (err) {
       console.error(err);
