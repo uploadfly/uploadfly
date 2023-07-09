@@ -10,6 +10,6 @@ const upload = multer({ storage });
 
 router.post("/upload", authenticateApiKey, upload.single("file"), uploadFile);
 
-router.delete("/delete", deleteFile);
+router.delete("/delete", authenticateApiKey, deleteFile);
 
 export { router as uploadRouter };
