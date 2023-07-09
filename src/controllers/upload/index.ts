@@ -1,10 +1,11 @@
 import { PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
-import { Request, Response } from "express";
+import { Response } from "express";
 import prisma from "../../../prisma";
 import filesize from "file-size";
 import { generateRandomKey } from "../../utils/generateRandomKey";
 import { s3Client } from "../../configs/s3";
+import { IRequest } from "../../interfaces";
 
 dotenv.config();
 
@@ -42,8 +43,10 @@ const uploadFileToS3 = (
   });
 };
 
-const uploadFile = async (req: Request, res: Response) => {
+const uploadFile = async (req: IRequest, res: Response) => {
   try {
+    const { apiKey } = req;
+
     if (!req.file) {
       res.status(400).json({
         message: "No file uploaded",
