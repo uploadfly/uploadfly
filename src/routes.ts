@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import multer from "multer";
 import { uploadFile } from "./controllers/upload";
 import { deleteFile } from "./controllers/delete";
