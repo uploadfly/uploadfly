@@ -1,6 +1,11 @@
 import { Response } from "express";
 import { IRequest } from "../interfaces";
 import prisma from "../../prisma";
+import {
+  DeleteObjectCommand,
+  DeleteObjectCommandInput,
+} from "@aws-sdk/client-s3";
+import { s3Client } from "../configs/s3";
 
 const deleteFile = async (req: IRequest, res: Response) => {
   const fileUrl = req.body.file_url;
@@ -16,17 +21,32 @@ const deleteFile = async (req: IRequest, res: Response) => {
 
   if (!file) return res.status(404).json({ message: "File not found" });
 
-  //   const fly = await prisma.fly.findUnique({
-  //     where: {
-  //       uuid: req.apiKey?.fly_id,
-  //     },
-  //   });
+  const fly = await prisma.fly.findUnique({
+    where: {
+      uuid: req.apiKey?.fly_id,
+    },
+  });
 
-  const fileWithSizeAsNumber = {
-    ...file,
-    size: Number(file.size),
+  if (file.fly_id !== fly?.uuid)
+    return res
+      .status(403)
+      .json({ message: "You are not allowed to delete this file" });
+
+  const params: DeleteObjectCommandInput = {
+    Bucket: "uploadfly",
+    Key: file.path,
   };
 
-  res.status(200).json({ message: "File deleted", file: fileWithSizeAsNumber });
+  const command = new DeleteObjectCommand(params);
+
+  s3Client.send(command).then(async () => {
+    await prisma.file.delete({
+      where: {
+        id: file.id,
+      },
+    });
+    res.status(200).json({ message: "File deleted successfully" });
+  });
 };
+
 export { deleteFile };
