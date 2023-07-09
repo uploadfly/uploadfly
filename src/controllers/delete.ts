@@ -6,6 +6,7 @@ import {
   DeleteObjectCommandInput,
 } from "@aws-sdk/client-s3";
 import { s3Client } from "../configs/s3";
+import { createInvalidation } from "../utils/createInvalidation";
 
 const deleteFile = async (req: IRequest, res: Response) => {
   const fileUrl = req.body.file_url;
@@ -40,6 +41,7 @@ const deleteFile = async (req: IRequest, res: Response) => {
   const command = new DeleteObjectCommand(params);
 
   s3Client.send(command).then(async () => {
+    await createInvalidation(file.path);
     await prisma.file.delete({
       where: {
         id: file.id,
