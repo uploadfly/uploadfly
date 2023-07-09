@@ -77,7 +77,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
 
     const fly = await prisma.fly.findUnique({
       where: {
-        uuid: apiKey.fly_id,
+        uuid: apiKey?.fly_id,
       },
     });
 
@@ -111,7 +111,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
           parent_folder_id: "",
           type: file.mimetype,
           size: fileSize,
-          fly_id: apiKey.fly_id,
+          fly_id: apiKey?.fly_id as string,
         },
       });
       res.status(200).json({
@@ -127,7 +127,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
     }
     await prisma.fly.update({
       where: {
-        uuid: apiKey.fly_id,
+        uuid: apiKey?.fly_id,
       },
       data: {
         used_storage: flyUsedStorage + fileSize,
