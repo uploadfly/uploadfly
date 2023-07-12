@@ -43,3 +43,5 @@ const deleteFolder = async (req: IRequest, res: Response) => {
     return;
   }
 };
+
+export { deleteFolder };
