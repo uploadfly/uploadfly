@@ -9,6 +9,13 @@ import { s3Client } from "../../configs/s3";
 import { createInvalidation } from "../../utils/createInvalidation";
 
 const deleteFile = async (req: IRequest, res: Response) => {
+  if (req.apiKey?.key_type === "public") {
+    res.status(403).json({
+      message: "Delete action forbidden via a public key",
+    });
+    return;
+  }
+
   const fileUrl = req.body.file_url;
 
   if (!fileUrl)
