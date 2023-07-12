@@ -7,6 +7,13 @@ import { Response } from "express";
 import prisma from "../../../prisma";
 
 const deleteFolder = async (req: IRequest, res: Response) => {
+  if (req.apiKey?.key_type === "public") {
+    res.status(403).json({
+      message: "Delete action forbidden via a public key",
+    });
+    return;
+  }
+
   const folder_id = req.query.folder_id as string;
 
   if (!folder_id) {
