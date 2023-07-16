@@ -84,6 +84,11 @@ const deleteFolder = async (req: IRequest, res: Response) => {
     await s3Client.send(deleteCommand);
 
     await createInvalidation(`/${folderPath}/*`);
+    await prisma.file.deleteMany({
+      where: {
+        fly_id: fly.uuid,
+      },
+    });
   };
 
   deleteFolder(folder_id)
