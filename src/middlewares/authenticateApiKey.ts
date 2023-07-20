@@ -1,6 +1,7 @@
 import { Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { IRequest } from "../interfaces";
+import { sendError } from "../utils/resolveRequest";
 
 const prisma = new PrismaClient();
 
@@ -11,7 +12,7 @@ const authenticateApiKey = async (
 ) => {
   try {
     if (!req.headers.authorization) {
-      return res.status(401).json({ message: "Unauthorized request" });
+      return sendError(res, "Unauthorized request. API key is missing.", 401);
     }
 
     const token = req.headers.authorization.split(" ")[1];
@@ -31,9 +32,7 @@ const authenticateApiKey = async (
     const apiKey = apiKeyByPublicKey || apiKeyBySecretKey;
 
     if (!apiKey || !apiKey.active) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized request. API key is invalid" });
+      return sendError(res, "Unauthorized request. API key is invalid.", 401);
     }
     req.apiKey = {
       ...apiKey,
@@ -41,8 +40,7 @@ const authenticateApiKey = async (
     };
     next();
   } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
+    sendError(res, "Internal server error.", 500);
   }
 };
 
