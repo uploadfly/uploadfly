@@ -7,19 +7,16 @@ import {
 } from "@aws-sdk/client-s3";
 import { s3Client } from "../../configs/s3";
 import { createInvalidation } from "../../utils/createInvalidation";
+import { sendError, sendResponse } from "../../utils/resolveRequest";
 
 const deleteFile = async (req: IRequest, res: Response) => {
   if (req.apiKey?.key_type === "public") {
-    res.status(403).json({
-      message: "Delete action forbidden via a public key",
-    });
-    return;
+    return sendError(res, "Delete action forbidden via a public key.", 403);
   }
 
   const fileUrl = req.body.file_url;
 
-  if (!fileUrl)
-    return res.status(400).json({ message: "File URL is missing in request" });
+  if (!fileUrl) return sendError(res, "File URL is missing in request", 400);
 
   const file = await prisma.file.findFirst({
     where: {
@@ -27,7 +24,7 @@ const deleteFile = async (req: IRequest, res: Response) => {
     },
   });
 
-  if (!file) return res.status(404).json({ message: "File not found" });
+  if (!file) return sendError(res, "File not found", 404);
 
   const fly = await prisma.fly.findUnique({
     where: {
@@ -36,9 +33,7 @@ const deleteFile = async (req: IRequest, res: Response) => {
   });
 
   if (file.fly_id !== fly?.uuid)
-    return res
-      .status(403)
-      .json({ message: "You are not allowed to delete this file" });
+    return sendError(res, "You are not allowed to delete this file", 403);
 
   const params: DeleteObjectCommandInput = {
     Bucket: "uploadfly",
@@ -54,7 +49,7 @@ const deleteFile = async (req: IRequest, res: Response) => {
         id: file.id,
       },
     });
-    res.status(200).json({ message: "File deleted successfully" });
+    sendResponse(res, { message: "File deleted successfully" });
   });
 };
 
