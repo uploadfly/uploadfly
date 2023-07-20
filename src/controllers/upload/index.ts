@@ -6,6 +6,7 @@ import filesize from "file-size";
 import { generateRandomKey } from "../../utils/generateRandomKey";
 import { s3Client } from "../../configs/s3";
 import { IRequest } from "../../interfaces";
+import { sendError, sendResponse } from "../../utils/resolveRequest";
 
 dotenv.config();
 
@@ -48,31 +49,29 @@ const uploadFile = async (req: IRequest, res: Response) => {
     const { apiKey } = req;
 
     if (!req.file) {
-      res.status(400).json({
-        message: "No file uploaded",
-      });
-      return;
+      return sendError(res, "No file provided", 400);
     }
     const file = req.file;
     const generatedFilename = `${file.originalname
       .replaceAll(".", "")
+      .replaceAll("(", "-")
+      .replaceAll(")", "-")
       .replaceAll(" ", "-")}-${generateRandomKey(6)}`;
     const filename = req.body.filename || generatedFilename;
 
     const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
 
     if (filename && !filenameRegex.test(filename)) {
-      res.status(400).json({
-        message:
-          "Filename cannot contain spaces and special characters (excluding dashes and underscores)",
-      });
-      return;
+      return sendError(
+        res,
+        "Filename cannot contain spaces and special characters (excluding dashes and underscores)",
+        400
+      );
     }
     const fileSize = file.size;
 
-    if (fileSize > 314572800) {
-      res.status(400).send("Max file size is 300MB");
-      return;
+    if (fileSize > 300000000) {
+      return sendError(res, "File size cannot exceed 300MB", 400);
     }
 
     const fly = await prisma.fly.findUnique({
@@ -82,16 +81,14 @@ const uploadFile = async (req: IRequest, res: Response) => {
     });
 
     if (!fly) {
-      res.status(404).json({ message: "Fly not found" });
-      return;
+      return sendError(res, "Fly not found", 404);
     }
 
     const flyStorage = Number(fly?.storage);
     const flyUsedStorage = Number(fly?.used_storage);
 
     if (flyUsedStorage + fileSize > flyStorage) {
-      res.status(403).json({ message: "Storage limit exceeded" });
-      return;
+      return sendError(res, "Storage limit exceeded", 403);
     }
 
     try {
@@ -114,7 +111,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
           fly_id: apiKey?.fly_id as string,
         },
       });
-      res.status(200).json({
+      sendResponse(res, {
         url: newFile?.url,
         path: newFile?.path,
         type: newFile?.type,
@@ -123,7 +120,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
       });
     } catch (err) {
       console.error(err);
-      res.status(500).send("File upload failed");
+      sendError(res, "File upload failed", 500);
     }
     await prisma.fly.update({
       where: {
@@ -135,7 +132,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    res.sendStatus(500);
+    sendError(res, "File upload failed", 500);
   }
 };
 
