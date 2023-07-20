@@ -21,13 +21,11 @@ const uploadFileToS3 = (
   route?: string
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
+    const fileExtension = getFileExtension(file.originalname || "txt");
+    const routeOrDefault = route || "";
     const params: PutObjectCommandInput = {
       Bucket: "uploadfly",
-      Key: `${public_key}${route || ""}/${
-        filename || file.originalname.split(".")[0]
-      }-${generateRandomKey(3)}.${getFileExtension(
-        file.originalname || "txt"
-      )}`,
+      Key: `${public_key}${routeOrDefault}/${filename}.${fileExtension}`,
       Body: file.buffer,
     };
 
@@ -52,12 +50,8 @@ const uploadFile = async (req: IRequest, res: Response) => {
       return sendError(res, "No file provided", 400);
     }
     const file = req.file;
-    const generatedFilename = `${file.originalname
-      .replaceAll(".", "")
-      .replaceAll("(", "-")
-      .replaceAll(")", "-")
-      .replaceAll(" ", "-")}-${generateRandomKey(6)}`;
-    const filename = req.body.filename || generatedFilename;
+
+    const filename = req.body.filename;
 
     const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
 
@@ -90,19 +84,20 @@ const uploadFile = async (req: IRequest, res: Response) => {
     if (flyUsedStorage + fileSize > flyStorage) {
       return sendError(res, "Storage limit exceeded", 403);
     }
-
-    const filenameWithKey = `${filename}-${generateRandomKey(6)}`;
+    const generatedName = filename
+      ? `${filename}-${generateRandomKey(8)}`
+      : generateRandomKey(16);
     try {
       const filePath = await uploadFileToS3(
         file,
         fly?.public_key as string,
-        `${filenameWithKey}`,
+        `${generatedName}`,
         req.body.route
       );
 
       const newFile = await prisma.file.create({
         data: {
-          name: filenameWithKey,
+          name: generatedName,
           url: `${process.env.AWS_CLOUDFRONT_URL}/${filePath}` as string,
           path: filePath as string,
           uploaded_via: "REST API",
