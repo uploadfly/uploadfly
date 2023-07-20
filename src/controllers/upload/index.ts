@@ -91,17 +91,18 @@ const uploadFile = async (req: IRequest, res: Response) => {
       return sendError(res, "Storage limit exceeded", 403);
     }
 
+    const filenameWithKey = `${filename}-${generateRandomKey(6)}`;
     try {
       const filePath = await uploadFileToS3(
         file,
         fly?.public_key as string,
-        `${filename}-${generateRandomKey(6)}`,
+        `${filenameWithKey}`,
         req.body.route
       );
 
       const newFile = await prisma.file.create({
         data: {
-          name: filename,
+          name: filenameWithKey,
           url: `${process.env.AWS_CLOUDFRONT_URL}/${filePath}` as string,
           path: filePath as string,
           uploaded_via: "REST API",
