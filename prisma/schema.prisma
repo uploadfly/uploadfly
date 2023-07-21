@@ -8,18 +8,18 @@ datasource db {
 }
 
 model user {
-  id                   Int       @id @unique @default(autoincrement())
-  email                String    @unique
-  username             String    @unique
-  password             String?   @default("")
-  otp                  String?
-  otp_expiry           DateTime?
-  email_verified       Boolean   @default(false)
-  created_at           DateTime  @default(now())
-  updated_at           DateTime  @updatedAt
-  uuid                 String    @unique @default(uuid())
-  auth_method          String?
-  github_id            Int?
+  id             Int       @id @unique @default(autoincrement())
+  email          String    @unique
+  username       String    @unique
+  password       String?   @default("")
+  otp            String?
+  otp_expiry     DateTime?
+  email_verified Boolean   @default(false)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  uuid           String    @unique @default(uuid())
+  auth_method    String?
+  github_id      Int?
 }
 
 model fly {
@@ -34,28 +34,10 @@ model fly {
   public_key   String
 }
 
-
-model apiKey {
-  id         Int      @id @unique @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  active     Boolean  @default(true)
-  user_id    String
-  fly_id     String
-  uuid       String   @unique @default(uuid())
-  permission Permission 
-  key        String    @unique 
-}
-
-enum Permission {
-  upload
-  full
-}
-
 model folder {
   id               Int      @id @unique @default(autoincrement())
   name             String
-  parent_folder_id String  @default("")
+  parent_folder_id String   @default("")
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
   uuid             String   @default(uuid())
@@ -65,7 +47,7 @@ model folder {
 model file {
   id               Int      @id @unique @default(autoincrement())
   name             String
-  url             String
+  url              String
   parent_folder_id String
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
@@ -76,3 +58,19 @@ model file {
   fly_id           String
 }
 
+model apikey {
+  id         Int               @id @unique(map: "apiKey_id_key") @default(autoincrement())
+  created_at DateTime          @default(now())
+  updated_at DateTime
+  active     Boolean           @default(true)
+  user_id    String
+  fly_id     String
+  uuid       String            @unique(map: "apiKey_uuid_key")
+  permission apikey_permission
+  key        String            @unique(map: "apiKey_key_key")
+}
+
+enum apikey_permission {
+  upload
+  full
+}
