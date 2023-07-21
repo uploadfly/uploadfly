@@ -17,27 +17,22 @@ const authenticateApiKey = async (
 
     const token = req.headers.authorization.split(" ")[1];
 
-    const apiKeyByPublicKey = await prisma.apiKey.findUnique({
+    const key = await prisma.apikey.findUnique({
       where: {
-        public_key: token,
+        key: token,
       },
     });
 
-    const apiKeyBySecretKey = await prisma.apiKey.findUnique({
-      where: {
-        secret_key: token,
-      },
-    });
-
-    const apiKey = apiKeyByPublicKey || apiKeyBySecretKey;
-
-    if (!apiKey || !apiKey.active) {
+    if (!key) {
       return sendError(res, "Unauthorized request. API key is invalid.", 401);
     }
-    req.apiKey = {
-      ...apiKey,
-      key_type: apiKeyByPublicKey ? "public" : "secret",
-    };
+
+    if (!key.active) {
+      return sendError(res, "API key has been deactivated.", 401);
+    }
+
+    req.apiKey = key;
+
     next();
   } catch (error) {
     sendError(res, "Internal server error.", 500);
