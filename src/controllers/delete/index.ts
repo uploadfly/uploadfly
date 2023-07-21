@@ -10,8 +10,12 @@ import { createInvalidation } from "../../utils/createInvalidation";
 import { sendError, sendResponse } from "../../utils/resolveRequest";
 
 const deleteFile = async (req: IRequest, res: Response) => {
-  if (req.apiKey?.key_type === "public") {
-    return sendError(res, "Delete action forbidden via a public key.", 403);
+  if (req.apiKey?.permission === "upload") {
+    return sendError(
+      res,
+      "The provided API key does not have the required permission to perfrom deletion.",
+      403
+    );
   }
 
   const fileUrl = req.body.file_url;
