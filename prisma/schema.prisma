@@ -32,6 +32,7 @@ model fly {
   uuid         String   @unique @default(uuid())
   name         String
   public_key   String
+  project_url String?
 }
 
 model folder {
