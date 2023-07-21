@@ -16,8 +16,8 @@ model user {
   otp_expiry     DateTime?
   email_verified Boolean   @default(false)
   created_at     DateTime  @default(now())
-  updated_at     DateTime
-  uuid           String    @unique
+  updated_at     DateTime  @updatedAt
+  uuid           String    @unique @default(uuid())
   auth_method    String?
   github_id      Int?
 }
@@ -25,7 +25,7 @@ model user {
 model fly {
   id           Int      @id @unique @default(autoincrement())
   user_id      String
-  storage      BigInt   @default(2147483648)
+  storage      BigInt   @default(2000000000)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   used_storage BigInt   @default(0)
@@ -40,7 +40,7 @@ model folder {
   parent_folder_id String   @default("")
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
-  uuid             String
+  uuid             String   @unique @default(uuid())
   fly_id           String
 }
 
@@ -56,6 +56,7 @@ model file {
   size             BigInt
   path             String
   fly_id           String
+  uuid             String   @unique @default(uuid())
 }
 
 model apikey {
