@@ -43,8 +43,13 @@ model apiKey {
   user_id    String
   fly_id     String
   uuid       String   @unique @default(uuid())
-  public_key String   @unique
-  secret_key String   @unique
+  permission Permission 
+  key        String    @unique 
+}
+
+enum Permission {
+  upload
+  full
 }
 
 model folder {
