@@ -16,8 +16,8 @@ model user {
   otp_expiry     DateTime?
   email_verified Boolean   @default(false)
   created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
-  uuid           String    @unique @default(uuid())
+  updated_at     DateTime
+  uuid           String    @unique
   auth_method    String?
   github_id      Int?
 }
@@ -40,7 +40,7 @@ model folder {
   parent_folder_id String   @default("")
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
-  uuid             String   @default(uuid())
+  uuid             String
   fly_id           String
 }
 
@@ -59,15 +59,15 @@ model file {
 }
 
 model apikey {
-  id         Int               @id @unique(map: "apiKey_id_key") @default(autoincrement())
+  id         Int               @id @unique() @default(autoincrement())
   created_at DateTime          @default(now())
-  updated_at DateTime
+  updated_at DateTime          @updatedAt
   active     Boolean           @default(true)
   user_id    String
   fly_id     String
-  uuid       String            @unique(map: "apiKey_uuid_key")
+  uuid       String            @unique() @default(uuid())
   permission apikey_permission
-  key        String            @unique(map: "apiKey_key_key")
+  key        String            @unique()
 }
 
 enum apikey_permission {
