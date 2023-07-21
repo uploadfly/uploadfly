@@ -11,42 +11,35 @@ import { Response } from "express";
 import prisma from "../../../prisma";
 import { s3Client } from "../../configs/s3";
 import { createInvalidation } from "../../utils/createInvalidation";
+import { sendError, sendResponse } from "../../utils/resolveRequest";
 
 const deleteFolder = async (req: IRequest, res: Response) => {
-  if (req.apiKey?.key_type === "public") {
-    res.status(403).json({
-      message: "Delete action forbidden via a public key",
-    });
-    return;
+  if (req.apiKey?.permission === "upload") {
+    return sendError(
+      res,
+      "The provided API key does not have the required permission to perfrom deletion.",
+      403
+    );
   }
 
-  const folder_id = req.query.folder_id as string;
+  const fly_id = req.body;
 
-  if (!folder_id) {
-    res.status(400).json({
-      message: "Folder ID is missing in request",
-    });
-    return;
+  if (!fly_id) {
+    return sendError(res, "Fly ID is missing in request.", 400);
   }
 
-  const fly = await prisma.fly.findFirst({
+  const fly = await prisma.fly.findUnique({
     where: {
-      public_key: folder_id,
+      uuid: fly_id,
     },
   });
 
   if (!fly) {
-    res.status(400).json({
-      message: "Invalid folder ID",
-    });
-    return;
+    return sendError(res, "Fly not found.", 404);
   }
 
   if (fly.user_id !== req.apiKey?.user_id) {
-    res.status(401).json({
-      message: "Unauthorized",
-    });
-    return;
+    return sendError(res, "Unauthorized to delete this fly.", 401);
   }
 
   const deleteObjectsInFolder = async (folderPath: string) => {
@@ -91,11 +84,9 @@ const deleteFolder = async (req: IRequest, res: Response) => {
     });
   };
 
-  deleteFolder(folder_id)
+  deleteFolder(fly.public_key)
     .then(() => {
-      res.status(200).json({
-        message: "Folder deleted",
-      });
+      sendResponse(res, { message: "All files has been deleted." }, 200);
     })
     .catch((err) => {
       console.log("Something went wrong");
