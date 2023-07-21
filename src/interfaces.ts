@@ -5,6 +5,6 @@ export interface IRequest extends Request {
     fly_id: string;
     active: boolean;
     user_id: string;
-    key_type: "public" | "secret";
+    permission: "upload" | "full";
   };
 }
