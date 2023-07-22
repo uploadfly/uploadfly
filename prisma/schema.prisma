@@ -70,6 +70,7 @@ model apikey {
   uuid       String            @unique() @default(uuid())
   permission apikey_permission
   key        String            @unique()
+  name       String            
 }
 
 enum apikey_permission {
