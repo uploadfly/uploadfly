@@ -58,6 +58,7 @@ model file {
   path             String
   fly_id           String
   uuid             String   @unique @default(uuid())
+  date             String
 }
 
 model apikey {
