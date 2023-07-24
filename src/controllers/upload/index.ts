@@ -109,12 +109,21 @@ const uploadFile = async (req: IRequest, res: Response) => {
           date: dayjs().format("YYYY-MM-DD"),
         },
       });
-      sendResponse(res, {
-        url: newFile?.url,
-        path: newFile?.path,
-        type: newFile?.type,
-        size: filesize(fileSize).human("si"),
-        name: newFile?.name,
+      // console.log(req.body);
+
+      sendResponse({
+        res,
+        req,
+        data: {
+          url: newFile?.url,
+          path: newFile?.path,
+          type: newFile?.type,
+          size: filesize(fileSize).human("si"),
+          name: newFile?.name,
+        },
+        status: 201,
+        endpoint: "/upload",
+        method: "post",
       });
     } catch (err) {
       console.error(err);
