@@ -74,6 +74,25 @@ model apikey {
   name       String            
 }
 
+model log {
+  id         Int               @id @unique() @default(autoincrement())
+  created_at DateTime          @default(now())
+  updated_at DateTime          @updatedAt
+  method     log_method
+  endpoint   String
+  status     Int
+  res_body   Json
+  req_body   Json
+  date       String
+}
+
+
+enum log_method {
+  post
+  get
+  delete
+}
+
 enum apikey_permission {
   upload
   full
