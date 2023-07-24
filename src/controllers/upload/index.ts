@@ -124,6 +124,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
         status: 201,
         endpoint: "/upload",
         method: "post",
+        fly_id: fly.uuid,
       });
     } catch (err) {
       console.error(err);
