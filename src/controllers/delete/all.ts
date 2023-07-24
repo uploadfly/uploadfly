@@ -14,89 +14,93 @@ import { createInvalidation } from "../../utils/createInvalidation";
 import { sendError, sendResponse } from "../../utils/resolveRequest";
 
 const deleteFolder = async (req: IRequest, res: Response) => {
-  if (req.apiKey?.permission === "upload") {
-    return sendError(
-      res,
-      "The provided API key does not have the required permission to perfrom deletion.",
-      403
-    );
-  }
-
-  const fly_id = req.body;
-
-  if (!fly_id) {
-    return sendError(res, "Fly ID is missing in request.", 400);
-  }
-
-  const fly = await prisma.fly.findUnique({
-    where: {
-      uuid: fly_id,
-    },
-  });
-
-  if (!fly) {
-    return sendError(res, "Fly not found.", 404);
-  }
-
-  if (fly.user_id !== req.apiKey?.user_id) {
-    return sendError(res, "Unauthorized to delete this fly.", 401);
-  }
-
-  const deleteObjectsInFolder = async (folderPath: string) => {
-    const listParams: ListObjectsCommandInput = {
-      Bucket: "uploadfly",
-      Prefix: folderPath,
-    };
-
-    const listCommand = new ListObjectsCommand(listParams);
-    const { Contents } = await s3Client.send(listCommand);
-
-    if (Contents && Contents.length > 0) {
-      const deleteParams: DeleteObjectsCommandInput = {
-        Bucket: "uploadfly",
-        Delete: {
-          Objects: Contents.map(({ Key }) => ({ Key })),
-          Quiet: false,
-        },
-      };
-
-      const deleteCommand = new DeleteObjectsCommand(deleteParams);
-      await s3Client.send(deleteCommand);
+  try {
+    if (req.apiKey?.permission === "upload") {
+      return sendError(
+        res,
+        "The provided API key does not have the required permission to perfrom deletion.",
+        403
+      );
     }
-  };
 
-  const deleteFolder = async (folderPath: string) => {
-    await deleteObjectsInFolder(folderPath);
+    const fly_id = req.query.fly_id as string;
 
-    const deleteParams: DeleteObjectCommandInput = {
-      Bucket: "uploadfly",
-      Key: `${folderPath}/`,
-    };
+    if (!fly_id) {
+      return sendError(res, "Fly ID is missing in request.", 400);
+    }
 
-    const deleteCommand = new DeleteObjectCommand(deleteParams);
-    await s3Client.send(deleteCommand);
-
-    await createInvalidation(`/${folderPath}/*`);
-    await prisma.file.deleteMany({
+    const fly = await prisma.fly.findUnique({
       where: {
-        fly_id: fly.uuid,
+        uuid: fly_id,
       },
     });
-  };
 
-  deleteFolder(fly.public_key)
-    .then(() => {
-      sendResponse(res, { message: "All files has been deleted." }, 200);
-    })
-    .catch((err) => {
-      console.log("Something went wrong");
+    if (!fly) {
+      return sendError(res, "Fly not found.", 404);
+    }
 
-      res.status(500).json({
-        message: "Something went wrong",
-        error: err,
+    if (fly.user_id !== req.apiKey?.user_id) {
+      return sendError(res, "Unauthorized to delete this fly.", 401);
+    }
+
+    const deleteObjectsInFolder = async (folderPath: string) => {
+      const listParams: ListObjectsCommandInput = {
+        Bucket: "uploadfly",
+        Prefix: folderPath,
+      };
+
+      const listCommand = new ListObjectsCommand(listParams);
+      const { Contents } = await s3Client.send(listCommand);
+
+      if (Contents && Contents.length > 0) {
+        const deleteParams: DeleteObjectsCommandInput = {
+          Bucket: "uploadfly",
+          Delete: {
+            Objects: Contents.map(({ Key }) => ({ Key })),
+            Quiet: false,
+          },
+        };
+
+        const deleteCommand = new DeleteObjectsCommand(deleteParams);
+        await s3Client.send(deleteCommand);
+      }
+    };
+
+    const deleteFolder = async (folderPath: string) => {
+      await deleteObjectsInFolder(folderPath);
+
+      const deleteParams: DeleteObjectCommandInput = {
+        Bucket: "uploadfly",
+        Key: `${folderPath}/`,
+      };
+
+      const deleteCommand = new DeleteObjectCommand(deleteParams);
+      await s3Client.send(deleteCommand);
+
+      await createInvalidation(`/${folderPath}/*`);
+      await prisma.file.deleteMany({
+        where: {
+          fly_id: fly.uuid,
+        },
       });
-      return;
-    });
+    };
+
+    deleteFolder(fly.public_key)
+      .then(() => {
+        sendResponse(res, { message: "All files has been deleted." }, 200);
+      })
+      .catch((err) => {
+        console.log("Something went wrong");
+
+        res.status(500).json({
+          message: "Something went wrong",
+          error: err,
+        });
+        return;
+      });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export { deleteFolder };
