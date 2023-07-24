@@ -11,11 +11,12 @@ const authenticateApiKey = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.headers.authorization) {
-      return sendError(res, "Unauthorized request. API key is missing.", 401);
-    }
+    const token = req.headers.authorization?.split(" ")[1];
 
-    const token = req.headers.authorization.split(" ")[1];
+    if (!token) {
+      sendError(res, "Unauthorized request. API key is missing.", 401);
+      return;
+    }
 
     const key = await prisma.apikey.findUnique({
       where: {
