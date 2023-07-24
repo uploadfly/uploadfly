@@ -7,6 +7,7 @@ import { generateRandomKey } from "../../utils/generateRandomKey";
 import { s3Client } from "../../configs/s3";
 import { IRequest } from "../../interfaces";
 import { sendError, sendResponse } from "../../utils/resolveRequest";
+import dayjs from "dayjs";
 
 dotenv.config();
 
@@ -105,6 +106,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
           type: file.mimetype,
           size: fileSize,
           fly_id: apiKey?.fly_id as string,
+          date: dayjs().format("YYYY-MM-DD"),
         },
       });
       sendResponse(res, {
