@@ -87,7 +87,17 @@ const deleteFolder = async (req: IRequest, res: Response) => {
 
     deleteFolder(fly.public_key)
       .then(() => {
-        sendResponse(res, { message: "All files has been deleted." }, 200);
+        sendResponse({
+          res,
+          req,
+          data: {
+            message: "All files deleted successfully",
+          },
+          status: 200,
+          endpoint: "/delete/all",
+          method: "delete",
+          fly_id: fly.uuid,
+        });
       })
       .catch((err) => {
         console.log("Something went wrong");
