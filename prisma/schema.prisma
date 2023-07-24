@@ -81,9 +81,10 @@ model log {
   method     log_method
   endpoint   String
   status     Int
-  res_body   Json
-  req_body   Json
+  response_body   Json
+  request_body   Json
   date       String
+  fly_id     String
 }
 
 
