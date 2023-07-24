@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../../prisma";
+import dayjs from "dayjs";
 
 type ApiResponse<T> = {
   success: boolean;
@@ -19,7 +20,7 @@ export const sendResponse = async <T>({
 }: {
   res: Response;
   req: Request;
-  data: T;
+  data: any;
   status: number;
   endpoint: string;
   method: "get" | "post" | "delete";
@@ -34,23 +35,18 @@ export const sendResponse = async <T>({
   res.status(status).json(response);
 
   const log = {
-    method,
-    endpoint,
-    status,
-    response_body: response,
-    request_body: req.body,
-  };
-
-  await prisma.log.create({
     data: {
       method,
       endpoint,
       status,
-      response_body: response,
+      response_body: data,
+      date: dayjs().format("DD-MM-YYYY"),
       request_body: req.body,
       fly_id,
     },
-  });
+  };
+
+  await prisma.log.create(log);
 };
 
 export const sendError = (res: Response, message: string, status: number) => {
