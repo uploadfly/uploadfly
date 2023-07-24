@@ -53,7 +53,17 @@ const deleteFile = async (req: IRequest, res: Response) => {
         id: file.id,
       },
     });
-    sendResponse(res, { message: "File deleted successfully" });
+    sendResponse({
+      res,
+      req,
+      data: {
+        message: "File deleted successfully",
+      },
+      status: 200,
+      endpoint: "/delete",
+      method: "delete",
+      fly_id: fly.uuid,
+    });
   });
 };
 
