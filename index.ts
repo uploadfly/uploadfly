@@ -18,7 +18,10 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("File uploads that fly 🪁");
+  res.send({
+    ip: req.ip,
+    ip2: req.socket.remoteAddress,
+  });
 });
 
 app.use("/", authenticateApiKey, uploadRouter);
