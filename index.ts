@@ -21,7 +21,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send(req.socket.remoteAddress?.split(":")[3] || "Unknown");
 });
 
-app.use("/", authenticateApiKey, uploadRouter);
+app.use("/", uploadRouter);
 
 const PORT = process.env.PORT || 2001;
 
