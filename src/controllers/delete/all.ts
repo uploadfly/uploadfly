@@ -14,11 +14,24 @@ import { createInvalidation } from "../../utils/createInvalidation";
 import { sendError, sendResponse } from "../../utils/resolveRequest";
 
 const deleteFolder = async (req: IRequest, res: Response) => {
+  const err = (message: string, status: number) => {
+    sendError({
+      endpoint: "/delete/all",
+      error: {
+        message,
+      },
+      fly_id: req.apiKey?.fly_id as string,
+      method: "delete",
+      req,
+      res,
+      status,
+    });
+  };
+
   try {
     if (req.apiKey?.permission === "upload") {
-      return sendError(
-        res,
-        "The provided API key does not have the required permission to perfrom deletion.",
+      return err(
+        "You cannot perform a delete action with an 'upload access' API key.",
         403
       );
     }
@@ -26,7 +39,7 @@ const deleteFolder = async (req: IRequest, res: Response) => {
     const fly_id = req.query.fly_id as string;
 
     if (!fly_id) {
-      return sendError(res, "Fly ID is missing in request.", 400);
+      return err("Fly ID is missing in request.", 400);
     }
 
     const fly = await prisma.fly.findUnique({
@@ -36,11 +49,11 @@ const deleteFolder = async (req: IRequest, res: Response) => {
     });
 
     if (!fly) {
-      return sendError(res, "Fly not found.", 404);
+      return err("Fly not found.", 404);
     }
 
     if (fly.user_id !== req.apiKey?.user_id) {
-      return sendError(res, "Unauthorized to delete this fly.", 401);
+      return err("Unauthorized to delete this fly.", 401);
     }
 
     const deleteObjectsInFolder = async (folderPath: string) => {
