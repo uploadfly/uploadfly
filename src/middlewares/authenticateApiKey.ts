@@ -8,13 +8,27 @@ const prisma = new PrismaClient();
 const authenticateApiKey = async (
   req: IRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  endpoint: string
 ) => {
+  const err = (message: string, status: number) => {
+    sendError({
+      endpoint,
+      error: {
+        message,
+      },
+      fly_id: req.apiKey?.fly_id as string,
+      method: "delete",
+      req,
+      res,
+      status,
+    });
+  };
   try {
     const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
-      sendError(res, "Unauthorized request. API key is missing.", 401);
+      err("Unauthorized request. API key is missing.", 401);
       return;
     }
 
@@ -25,18 +39,18 @@ const authenticateApiKey = async (
     });
 
     if (!key) {
-      return sendError(res, "Unauthorized request. API key is invalid.", 401);
+      return err("Unauthorized request. API key is invalid.", 401);
     }
 
     if (!key.active) {
-      return sendError(res, "API key has been deactivated.", 401);
+      return err("API key has been deactivated.", 401);
     }
 
     req.apiKey = key;
 
     next();
   } catch (error) {
-    sendError(res, "Internal server error.", 500);
+    err("Internal server error.", 500);
   }
 };
 
