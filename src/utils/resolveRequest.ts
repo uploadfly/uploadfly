@@ -34,7 +34,7 @@ export const sendResponse = async <T>({
 
   res.status(status).json(response);
 
-  const log = {
+  await prisma.log.create({
     data: {
       method,
       endpoint,
@@ -43,10 +43,9 @@ export const sendResponse = async <T>({
       date: dayjs().format("DD-MM-YYYY"),
       request_body: req.body,
       fly_id,
+      ip_address: req.socket.remoteAddress?.split(":")[3] || "0.0.0.0",
     },
-  };
-
-  await prisma.log.create(log);
+  });
 };
 
 export const sendError = (res: Response, message: string, status: number) => {
