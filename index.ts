@@ -18,10 +18,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.get("/", (req: Request, res: Response) => {
-  res.send({
-    ip: req.ip,
-    ip2: req.socket.remoteAddress,
-  });
+  res.send(req.socket.remoteAddress?.split(":")[3] || "Unknown");
 });
 
 app.use("/", authenticateApiKey, uploadRouter);
