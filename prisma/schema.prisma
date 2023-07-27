@@ -9,6 +9,7 @@ datasource db {
 
 model user {
   id             Int       @id @unique @default(autoincrement())
+  uuid           String    @unique @default(uuid())
   email          String    @unique
   username       String    @unique
   password       String?   @default("")
@@ -17,19 +18,18 @@ model user {
   email_verified Boolean   @default(false)
   created_at     DateTime  @default(now())
   updated_at     DateTime  @updatedAt
-  uuid           String    @unique @default(uuid())
   auth_method    String?
   github_id      Int?
 }
 
 model fly {
   id           Int      @id @unique @default(autoincrement())
+  uuid         String   @unique @default(uuid())
   user_id      String
   storage      BigInt   @default(2000000000)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   used_storage BigInt   @default(0)
-  uuid         String   @unique @default(uuid())
   name         String
   public_key   String
   project_url String?
@@ -37,16 +37,17 @@ model fly {
 
 model folder {
   id               Int      @id @unique @default(autoincrement())
+  uuid             String   @unique @default(uuid())
   name             String
   parent_folder_id String   @default("")
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
-  uuid             String   @unique @default(uuid())
   fly_id           String
 }
 
 model file {
   id               Int      @id @unique @default(autoincrement())
+  uuid             String   @unique @default(uuid())
   name             String
   url              String
   parent_folder_id String
@@ -57,18 +58,17 @@ model file {
   size             BigInt
   path             String
   fly_id           String
-  uuid             String   @unique @default(uuid())
   date             String
 }
 
 model apikey {
   id         Int               @id @unique() @default(autoincrement())
+  uuid       String            @unique() @default(uuid())
   created_at DateTime          @default(now())
   updated_at DateTime          @updatedAt
   active     Boolean           @default(true)
   user_id    String
   fly_id     String
-  uuid       String            @unique() @default(uuid())
   permission apikey_permission
   key        String            @unique()
   name       String            
@@ -76,6 +76,7 @@ model apikey {
 
 model log {
   id         Int               @id @unique() @default(autoincrement())
+  uuid       String           @unique @default(uuid())
   created_at DateTime          @default(now())
   updated_at DateTime          @updatedAt
   method     log_method
@@ -84,7 +85,7 @@ model log {
   response_body   Json
   request_body   Json
   date       String
-  fly_id     String            @default("")
+  fly_id     String           @default("")
   ip_address String           @default("0.0.0.0")
 }
 
