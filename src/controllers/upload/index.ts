@@ -44,11 +44,24 @@ const uploadFileToS3 = (
 };
 
 const uploadFile = async (req: IRequest, res: Response) => {
+  const err = (message: string, status: number) => {
+    sendError({
+      endpoint: "/upload",
+      error: {
+        message,
+      },
+      fly_id: req.apiKey?.fly_id as string,
+      method: "delete",
+      req,
+      res,
+      status,
+    });
+  };
   try {
     const { apiKey } = req;
 
     if (!req.file) {
-      return sendError(res, "No file provided", 400);
+      return err("No file provided", 400);
     }
     const file = req.file;
 
@@ -57,8 +70,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
     const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
 
     if (filename && !filenameRegex.test(filename)) {
-      return sendError(
-        res,
+      return err(
         "Filename cannot contain spaces and special characters (excluding dashes and underscores)",
         400
       );
@@ -66,7 +78,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
     const fileSize = file.size;
 
     if (fileSize > 300000000) {
-      return sendError(res, "File size cannot exceed 300MB", 400);
+      return err("File size cannot exceed 300MB", 400);
     }
 
     const fly = await prisma.fly.findUnique({
@@ -76,14 +88,14 @@ const uploadFile = async (req: IRequest, res: Response) => {
     });
 
     if (!fly) {
-      return sendError(res, "Fly not found", 404);
+      return err("Fly not found", 404);
     }
 
     const flyStorage = Number(fly?.storage);
     const flyUsedStorage = Number(fly?.used_storage);
 
     if (flyUsedStorage + fileSize > flyStorage) {
-      return sendError(res, "Storage limit exceeded", 403);
+      return err("Storage limit exceeded", 403);
     }
     const generatedName = filename
       ? `${filename}-${generateRandomKey(8)}`
@@ -126,9 +138,8 @@ const uploadFile = async (req: IRequest, res: Response) => {
         method: "post",
         fly_id: fly.uuid,
       });
-    } catch (err) {
-      console.error(err);
-      sendError(res, "File upload failed", 500);
+    } catch (error) {
+      err("File upload failed", 500);
     }
     await prisma.fly.update({
       where: {
@@ -139,8 +150,8 @@ const uploadFile = async (req: IRequest, res: Response) => {
       },
     });
   } catch (error) {
-    console.log(error);
-    sendError(res, "File upload failed", 500);
+    // console.log(error);
+    err("File upload failed", 500);
   }
 };
 
