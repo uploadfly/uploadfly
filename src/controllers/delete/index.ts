@@ -10,9 +10,22 @@ import { createInvalidation } from "../../utils/createInvalidation";
 import { sendError, sendResponse } from "../../utils/resolveRequest";
 
 const deleteFile = async (req: IRequest, res: Response) => {
-  if (req.apiKey?.permission === "upload") {
-    return sendError(
+  const err = (message: string, status: number) => {
+    sendError({
+      endpoint: "/delete",
+      error: {
+        message,
+      },
+      fly_id: req.apiKey?.fly_id as string,
+      method: "delete",
+      req,
       res,
+      status,
+    });
+  };
+
+  if (req.apiKey?.permission === "upload") {
+    return err(
       "The provided API key does not have the required permission to perfrom deletion.",
       403
     );
@@ -20,7 +33,7 @@ const deleteFile = async (req: IRequest, res: Response) => {
 
   const fileUrl = req.body.file_url;
 
-  if (!fileUrl) return sendError(res, "File URL is missing in request", 400);
+  if (!fileUrl) return err("File URL is missing in request", 400);
 
   const file = await prisma.file.findFirst({
     where: {
@@ -28,7 +41,7 @@ const deleteFile = async (req: IRequest, res: Response) => {
     },
   });
 
-  if (!file) return sendError(res, "File not found", 404);
+  if (!file) return err("File not found", 404);
 
   const fly = await prisma.fly.findUnique({
     where: {
@@ -37,7 +50,7 @@ const deleteFile = async (req: IRequest, res: Response) => {
   });
 
   if (file.fly_id !== fly?.uuid)
-    return sendError(res, "You are not allowed to delete this file", 403);
+    return err("You are not allowed to delete this file", 403);
 
   const params: DeleteObjectCommandInput = {
     Bucket: "uploadfly",
