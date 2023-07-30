@@ -66,6 +66,13 @@ const deleteFile = async (req: IRequest, res: Response) => {
         id: file.id,
       },
     });
+
+    await prisma.file.delete({
+      where: {
+        uuid: file.uuid,
+      },
+    });
+
     sendResponse({
       res,
       req,
