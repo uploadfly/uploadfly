@@ -51,7 +51,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
         message,
       },
       fly_id: req.apiKey?.fly_id as string,
-      method: "delete",
+      method: "post",
       req,
       res,
       status,
