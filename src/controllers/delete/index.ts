@@ -67,9 +67,12 @@ const deleteFile = async (req: IRequest, res: Response) => {
       },
     });
 
-    await prisma.file.delete({
+    await prisma.fly.update({
       where: {
-        uuid: file.uuid,
+        uuid: file.fly_id,
+      },
+      data: {
+        used_storage: fly.used_storage - file.size,
       },
     });
 
