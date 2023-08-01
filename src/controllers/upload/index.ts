@@ -66,7 +66,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
     }
     const file = req.file;
 
-    const {filename, maxFileSize} = req.body;
+    const { filename, maxFileSize } = req.body;
 
     const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
 
@@ -77,14 +77,14 @@ const uploadFile = async (req: IRequest, res: Response) => {
       );
     }
     const fileSize = file.size;
-    const parsedFileSize  = parseDataSize(maxFileSize)
+    const parsedFileSize = parseDataSize(maxFileSize);
 
-    if(parsedFileSize.error){
-      return err("Invalid maxFileSzie value", 400)
+    if (parsedFileSize.error) {
+      return err("Invalid maxFileSzie value", 400);
     }
 
-    if(fileSize > parsedFileSize.result){
-    return err(`File size cannot excceed ${maxFileSize.toUpperCase()}`, 400)
+    if (fileSize > parsedFileSize.result) {
+      return err(`File size cannot excceed ${maxFileSize.toUpperCase()}`, 400);
     }
 
     if (fileSize > 300000000) {
