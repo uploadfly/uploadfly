@@ -106,14 +106,19 @@ const uploadFile = async (req: IRequest, res: Response) => {
       },
     });
 
-    const allowedFileTypesToArray = allowedFileTypes.split(",");
+    let allowedFileTypesToArray;
 
-    const uppercaseAllowedFileTypes = allowedFileTypesToArray.map(
+    if (allowedFileTypes) {
+      allowedFileTypesToArray = allowedFileTypes.split(",");
+    }
+
+    const uppercaseAllowedFileTypes = allowedFileTypesToArray?.map(
       (value: string) => value.toUpperCase().trim()
     );
 
     if (
-      !uppercaseAllowedFileTypes.includes(
+      allowedFileTypes &&
+      !uppercaseAllowedFileTypes?.includes(
         file.mimetype.split("/")[1].toUpperCase()
       )
     ) {
