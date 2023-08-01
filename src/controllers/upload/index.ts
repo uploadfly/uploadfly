@@ -131,8 +131,6 @@ const uploadFile = async (req: IRequest, res: Response) => {
           date: dayjs().format("YYYY-MM-DD"),
         },
       });
-      // console.log(req.body);
-
       sendResponse({
         res,
         req,
@@ -160,7 +158,6 @@ const uploadFile = async (req: IRequest, res: Response) => {
       },
     });
   } catch (error) {
-    console.log(error);
     err("File upload failed", 500);
   }
 };
