@@ -8,6 +8,7 @@ import { s3Client } from "../../configs/s3";
 import { IRequest } from "../../interfaces";
 import { sendError, sendResponse } from "../../utils/resolveRequest";
 import dayjs from "dayjs";
+import parseDataSize from "../../utils/parseDataSize";
 
 dotenv.config();
 
@@ -65,7 +66,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
     }
     const file = req.file;
 
-    const filename = req.body.filename;
+    const {filename, maxFileSize} = req.body;
 
     const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
 
@@ -76,6 +77,15 @@ const uploadFile = async (req: IRequest, res: Response) => {
       );
     }
     const fileSize = file.size;
+    const parsedFileSize  = parseDataSize(maxFileSize)
+
+    if(parsedFileSize.error){
+      return err("Invalid maxFileSzie value", 400)
+    }
+
+    if(fileSize > parsedFileSize.result){
+    return err(`File size cannot excceed ${maxFileSize.toUpperCase()}`, 400)
+    }
 
     if (fileSize > 300000000) {
       return err("File size cannot exceed 300MB", 400);
@@ -150,7 +160,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
       },
     });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     err("File upload failed", 500);
   }
 };
