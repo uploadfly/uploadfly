@@ -66,7 +66,12 @@ const uploadFile = async (req: IRequest, res: Response) => {
     }
     const file = req.file;
 
-    const { filename, maxFileSize } = req.body;
+    const {
+      filename,
+      maxFileSize,
+      allowedFileTypes,
+    }: { filename: string; maxFileSize: string; allowedFileTypes: string } =
+      req.body;
 
     const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
 
@@ -77,13 +82,17 @@ const uploadFile = async (req: IRequest, res: Response) => {
       );
     }
     const fileSize = file.size;
-    const parsedFileSize = parseDataSize(maxFileSize);
+    let parsedFileSize;
 
-    if (parsedFileSize.error) {
+    if (maxFileSize) {
+      parsedFileSize = parseDataSize(maxFileSize);
+    }
+
+    if (parsedFileSize?.error) {
       return err("Invalid maxFileSzie value", 400);
     }
 
-    if (fileSize > parsedFileSize.result) {
+    if (fileSize > parsedFileSize?.result!) {
       return err(`File size cannot excceed ${maxFileSize.toUpperCase()}`, 400);
     }
 
@@ -96,6 +105,32 @@ const uploadFile = async (req: IRequest, res: Response) => {
         uuid: apiKey?.fly_id,
       },
     });
+
+    const allowedFileTypesToArray = allowedFileTypes.split(",");
+
+    // const allAllowedFileTypesValuesAreStrings = allowedFileTypesToArray.every(
+    //   (value: string) => typeof value === "string"
+    // );
+
+    // if (!allAllowedFileTypesValuesAreStrings) {
+    //   return err("allowedFileTypes contains one or more invalid values", 400);
+    // }
+
+    const uppercaseAllowedFileTypes = allowedFileTypesToArray.map(
+      (value: string) => value.toUpperCase().trim()
+    );
+
+    console.log(uppercaseAllowedFileTypes);
+
+    console.log(file.mimetype);
+
+    if (
+      !uppercaseAllowedFileTypes.includes(
+        file.mimetype.split("/")[1].toUpperCase()
+      )
+    ) {
+      return err("Invalid file type", 400);
+    }
 
     if (!fly) {
       return err("Fly not found", 404);
@@ -158,6 +193,7 @@ const uploadFile = async (req: IRequest, res: Response) => {
       },
     });
   } catch (error) {
+    console.log(error);
     err("File upload failed", 500);
   }
 };
