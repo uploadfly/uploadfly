@@ -148,7 +148,9 @@ const uploadFile = async (req: IRequest, res: Response) => {
 
       const newFile = await prisma.file.create({
         data: {
-          name: generatedName,
+          name: `${generatedName}.${getFileExtension(
+            file.originalname || "txt"
+          ).toLowerCase()}`,
           url: `${process.env.AWS_CLOUDFRONT_URL}/${filePath}` as string,
           path: filePath as string,
           uploaded_via: "REST API",
