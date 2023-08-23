@@ -27,7 +27,9 @@ const uploadFileToS3 = (
     const routeOrDefault = route || "";
     const params: PutObjectCommandInput = {
       Bucket: "uploadfly",
-      Key: `${public_key}${routeOrDefault}/${filename}.${fileExtension}`,
+      Key:
+        `${public_key}${routeOrDefault}/${filename}.${fileExtension}` ||
+        `${public_key}/${routeOrDefault}/${file.originalname}`,
       Body: file.buffer,
     };
 
@@ -135,23 +137,37 @@ const uploadFile = async (req: IRequest, res: Response) => {
     if (flyUsedStorage + fileSize > flyStorage) {
       return err("Storage limit exceeded", 403);
     }
-    const generatedName = filename
-      ? `${filename}-${generateRandomKey(8)}`
-      : generateRandomKey(16);
+
+    const fileNameWithExtension =
+      filename &&
+      `${filename}.${getFileExtension(
+        file.originalname || "txt"
+      ).toLowerCase()}`;
+
+    function getFileNameWithoutExtension(filename: string): string {
+      const lastDotIndex = filename.lastIndexOf(".");
+
+      if (lastDotIndex <= 0) {
+        return filename;
+      }
+
+      const filenameWithoutExtension = filename.substring(0, lastDotIndex);
+
+      return filenameWithoutExtension;
+    }
+
     try {
       const filePath = await uploadFileToS3(
         file,
         fly?.public_key as string,
-        `${generatedName}`,
+        filename || getFileNameWithoutExtension(file.originalname),
         req.body.route
       );
 
       const newFile = await prisma.file.create({
         data: {
-          name: `${generatedName}.${getFileExtension(
-            file.originalname || "txt"
-          ).toLowerCase()}`,
-          url: `${process.env.AWS_CLOUDFRONT_URL}/${filePath}` as string,
+          name: fileNameWithExtension || file.originalname,
+          url: encodeURI(`${process.env.AWS_CLOUDFRONT_URL}/${filePath}`),
           path: filePath as string,
           uploaded_via: "REST API",
           parent_folder_id: "",
