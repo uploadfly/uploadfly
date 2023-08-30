@@ -10,6 +10,7 @@ datasource db {
 model user {
   id             Int       @id @unique @default(autoincrement())
   uuid           String    @unique @default(uuid())
+  name           String?   @default("")
   email          String    @unique
   username       String    @unique
   password       String?   @default("")
@@ -20,6 +21,15 @@ model user {
   updated_at     DateTime  @updatedAt
   auth_method    String?
   github_id      Int?
+}
+
+model emailReset {
+  id          Int      @id @unique @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  user_id     String
+  email       String
+  created_at  DateTime @default(now())
+  is_verified Boolean @default(false)
 }
 
 model fly {
@@ -99,7 +109,7 @@ model refreshToken {
   id         Int      @id @unique() @default(autoincrement())
   created_at DateTime @default(now())
   user_id    String   @unique
-  token      String  @db.LongText
+  token      String   @db.LongText
   expires_at DateTime
 }
 
