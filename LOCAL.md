@@ -28,7 +28,7 @@ docker compose up -d
 
 TODO
 
-### 3. Install dependencies
+### 4. Install dependencies
 
 Use `npm` to install dependencies.
 
@@ -36,7 +36,7 @@ Use `npm` to install dependencies.
 npm install
 ```
 
-### 4. Running the dev server
+### 5. Running the dev server
 
 Finally, you can run the dev server:
 
