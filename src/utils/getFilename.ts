@@ -1,3 +1,3 @@
 export const getFileExtension = (filename: string): string => {
-  return filename.split(".").pop()!;
+  return filename.split(".").pop() || "";
 };
