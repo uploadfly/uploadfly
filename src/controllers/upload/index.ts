@@ -119,17 +119,21 @@ const uploadFile = async (req: IRequest, res: Response) => {
       return filenameWithoutExtension;
     }
 
+    const extension = file.mimetype.split("/")[1];
+
+    const file_name = `${getFileNameWithoutExtension(filename)}.${extension}`;
+
     try {
       const filePath = await uploadFileToS3(
         arrayBuffer,
         fly?.public_key as string,
-        filename,
+        file_name,
         req.body.route
       );
 
       const newFile = await prisma.file.create({
         data: {
-          name: fileNameWithExtension || file.originalname,
+          name: file_name,
           url: encodeURI(`${process.env.AWS_CLOUDFRONT_URL}/${filePath}`),
           path: filePath as string,
           uploaded_via: "REST API",
@@ -156,7 +160,8 @@ const uploadFile = async (req: IRequest, res: Response) => {
         fly_id: fly.uuid,
       });
     } catch (error) {
-      err("File upload failed", 500);
+      console.log(error);
+      err("File upload failed.", 500);
     }
     await prisma.fly.update({
       where: {
