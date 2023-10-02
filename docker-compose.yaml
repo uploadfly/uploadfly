@@ -1,0 +1,22 @@
+# create a docker image with mysql and a default password of admin
+version: "3"
+
+name: uploadfly
+
+services:
+  db:
+    image: bitnami/mysql:latest
+    container_name: uploadfly-db
+    restart: always
+    environment:
+      MYSQL_ROOT_USER: dev
+      MYSQL_ROOT_PASSWORD: dev
+      MYSQL_DATABASE: uploadfly
+    # create a volume for the docker container_name
+    volumes:
+      - uploadfly-data:/bitnami/mysql/data
+    ports:
+      - 3306:3306
+volumes:
+  uploadfly-data:
+    driver: local
