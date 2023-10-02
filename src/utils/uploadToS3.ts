@@ -1,22 +1,20 @@
 import { PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
 import { s3Client } from "../configs/s3";
-import { getFileExtension } from "./getFilename";
+import { generateRandomKey } from "./generateRandomKey";
 
 export const uploadFileToS3 = (
-  file: Express.Multer.File,
+  buffer: Buffer | ArrayBuffer,
   public_key: string,
   filename: string,
   route?: string
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const fileExtension = getFileExtension(file.originalname || "txt");
     const routeOrDefault = route || "";
+    const body = buffer instanceof ArrayBuffer ? Buffer.from(buffer) : buffer;
     const params: PutObjectCommandInput = {
       Bucket: "uploadfly",
-      Key:
-        `${public_key}${routeOrDefault}/${filename}.${fileExtension}` ||
-        `${public_key}/${routeOrDefault}/${file.originalname}`,
-      Body: file.buffer,
+      Key: `${public_key}${routeOrDefault}/${generateRandomKey(6)}-${filename}`,
+      Body: body,
     };
 
     const command = new PutObjectCommand(params);
