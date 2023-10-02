@@ -9,42 +9,10 @@ import { IRequest } from "../../interfaces";
 import { sendError, sendResponse } from "../../utils/resolveRequest";
 import dayjs from "dayjs";
 import parseDataSize from "../../utils/parseDataSize";
+import { getFileExtension } from "../../utils/getFilename";
+import { uploadFileToS3 } from "../../utils/uploadToS3";
 
 dotenv.config();
-
-const getFileExtension = (filename: string): string => {
-  return filename.split(".").pop()!;
-};
-
-const uploadFileToS3 = (
-  file: Express.Multer.File,
-  public_key: string,
-  filename: string,
-  route?: string
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const fileExtension = getFileExtension(file.originalname || "txt");
-    const routeOrDefault = route || "";
-    const params: PutObjectCommandInput = {
-      Bucket: "uploadfly",
-      Key:
-        `${public_key}${routeOrDefault}/${filename}.${fileExtension}` ||
-        `${public_key}/${routeOrDefault}/${file.originalname}`,
-      Body: file.buffer,
-    };
-
-    const command = new PutObjectCommand(params);
-
-    s3Client
-      .send(command)
-      .then(() => {
-        resolve(`${params.Key}`);
-      })
-      .catch((err: any) => {
-        reject(err);
-      });
-  });
-};
 
 const uploadFile = async (req: IRequest, res: Response) => {
   const err = (message: string, status: number) => {
