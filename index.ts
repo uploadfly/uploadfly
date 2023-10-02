@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.get("/", (req: Request, res: Response) => {
-res.redirect("https://uploadfly.cloud")
+  res.redirect("https://uploadfly.cloud");
 });
 
 app.use("/", uploadRouter);

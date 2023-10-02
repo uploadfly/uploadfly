@@ -1,50 +1,12 @@
-import { PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
-import dotenv from "dotenv";
 import { Response } from "express";
 import prisma from "../../../prisma";
 import filesize from "file-size";
-import { generateRandomKey } from "../../utils/generateRandomKey";
-import { s3Client } from "../../configs/s3";
 import { IRequest } from "../../interfaces";
-import { sendError, sendResponse } from "../../utils/resolveRequest";
 import dayjs from "dayjs";
 import parseDataSize from "../../utils/parseDataSize";
-
-dotenv.config();
-
-const getFileExtension = (filename: string): string => {
-  return filename.split(".").pop()!;
-};
-
-const uploadFileToS3 = (
-  file: Express.Multer.File,
-  public_key: string,
-  filename: string,
-  route?: string
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const fileExtension = getFileExtension(file.originalname || "txt");
-    const routeOrDefault = route || "";
-    const params: PutObjectCommandInput = {
-      Bucket: "uploadfly",
-      Key:
-        `${public_key}${routeOrDefault}/${filename}.${fileExtension}` ||
-        `${public_key}/${routeOrDefault}/${file.originalname}`,
-      Body: file.buffer,
-    };
-
-    const command = new PutObjectCommand(params);
-
-    s3Client
-      .send(command)
-      .then(() => {
-        resolve(`${params.Key}`);
-      })
-      .catch((err: any) => {
-        reject(err);
-      });
-  });
-};
+import { getFileExtension } from "../../utils/getFilename";
+import { uploadFileToS3 } from "../../utils/uploadToS3";
+import { sendError, sendResponse } from "../../utils/resolveRequest";
 
 const uploadFile = async (req: IRequest, res: Response) => {
   const err = (message: string, status: number) => {
@@ -61,12 +23,17 @@ const uploadFile = async (req: IRequest, res: Response) => {
     });
   };
   try {
-    const { apiKey } = req;
-
     if (!req.file) {
       return err("No file provided", 400);
     }
-    const file = req.file;
+
+    const { apiKey, file } = req;
+
+    if (!apiKey) {
+      return err("No API key provided", 400);
+    }
+
+    const arrayBuffer = Buffer.from(file.buffer);
 
     const {
       filename,
@@ -75,14 +42,10 @@ const uploadFile = async (req: IRequest, res: Response) => {
     }: { filename: string; maxFileSize: string; allowedFileTypes: string } =
       req.body;
 
-    const filenameRegex = /^[a-zA-Z0-9_.-]+$/;
-
-    if (filename && !filenameRegex.test(filename)) {
-      return err(
-        "Filename cannot contain spaces and special characters (excluding dashes and underscores)",
-        400
-      );
+    if (!filename) {
+      return err("No filename provided", 400);
     }
+
     const fileSize = file.size;
     let parsedFileSize;
 
@@ -158,9 +121,9 @@ const uploadFile = async (req: IRequest, res: Response) => {
 
     try {
       const filePath = await uploadFileToS3(
-        file,
+        arrayBuffer,
         fly?.public_key as string,
-        filename || getFileNameWithoutExtension(file.originalname),
+        filename,
         req.body.route
       );
 
