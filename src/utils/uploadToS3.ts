@@ -1,6 +1,5 @@
 import { PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
 import { s3Client } from "../configs/s3";
-import { generateRandomKey } from "./generateRandomKey";
 
 export const uploadFileToS3 = (
   buffer: Buffer | ArrayBuffer,
