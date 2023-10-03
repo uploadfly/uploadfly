@@ -44,7 +44,7 @@ const deleteFolder = async (req: IRequest, res: Response) => {
 
     const fly = await prisma.fly.findUnique({
       where: {
-        uuid: fly_id,
+        id: fly_id,
       },
     });
 
@@ -93,7 +93,7 @@ const deleteFolder = async (req: IRequest, res: Response) => {
       await createInvalidation(`/${folderPath}/*`);
       await prisma.file.deleteMany({
         where: {
-          fly_id: fly.uuid,
+          fly_id: fly.id,
         },
       });
     };
@@ -109,7 +109,7 @@ const deleteFolder = async (req: IRequest, res: Response) => {
           status: 200,
           endpoint: "/delete/all",
           method: "delete",
-          fly_id: fly.uuid,
+          fly_id: fly.id,
         });
       })
       .catch((err) => {

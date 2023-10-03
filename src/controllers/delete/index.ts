@@ -45,11 +45,11 @@ const deleteFile = async (req: IRequest, res: Response) => {
 
   const fly = await prisma.fly.findUnique({
     where: {
-      uuid: req.apiKey?.fly_id,
+      id: req.apiKey?.fly_id,
     },
   });
 
-  if (file.fly_id !== fly?.uuid)
+  if (file.fly_id !== fly?.id)
     return err("You are not allowed to delete this file", 403);
 
   const params: DeleteObjectCommandInput = {
@@ -69,7 +69,7 @@ const deleteFile = async (req: IRequest, res: Response) => {
 
     await prisma.fly.update({
       where: {
-        uuid: file.fly_id,
+        id: file.fly_id,
       },
       data: {
         used_storage: fly.used_storage - file.size,
@@ -85,7 +85,7 @@ const deleteFile = async (req: IRequest, res: Response) => {
       status: 200,
       endpoint: "/delete",
       method: "delete",
-      fly_id: fly.uuid,
+      fly_id: fly.id,
     });
   });
 };
