@@ -13,7 +13,7 @@ export const uploadFileToS3 = (
     const body = buffer instanceof ArrayBuffer ? Buffer.from(buffer) : buffer;
     const params: PutObjectCommandInput = {
       Bucket: "uploadfly",
-      Key: `${public_key}${routeOrDefault}/${generateRandomKey(6)}-${filename}`,
+      Key: `${public_key}${routeOrDefault}/${filename}`,
       Body: body,
     };
 
