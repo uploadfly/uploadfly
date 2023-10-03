@@ -7,6 +7,7 @@ import parseDataSize from "../../utils/parseDataSize";
 import { getFileExtension } from "../../utils/getFilename";
 import { uploadFileToS3 } from "../../utils/uploadToS3";
 import { sendError, sendResponse } from "../../utils/resolveRequest";
+import { generateRandomKey } from "../../utils/generateRandomKey";
 
 const uploadFile = async (req: IRequest, res: Response) => {
   const err = (message: string, status: number) => {
@@ -41,10 +42,6 @@ const uploadFile = async (req: IRequest, res: Response) => {
       allowedFileTypes,
     }: { filename: string; maxFileSize: string; allowedFileTypes: string } =
       req.body;
-
-    if (!filename) {
-      return err("No filename provided", 400);
-    }
 
     const fileSize = file.size;
     let parsedFileSize;
@@ -101,12 +98,6 @@ const uploadFile = async (req: IRequest, res: Response) => {
       return err("Storage limit exceeded", 403);
     }
 
-    const fileNameWithExtension =
-      filename &&
-      `${filename}.${getFileExtension(
-        file.originalname || "txt"
-      ).toLowerCase()}`;
-
     function getFileNameWithoutExtension(filename: string): string {
       const lastDotIndex = filename.lastIndexOf(".");
 
@@ -121,7 +112,11 @@ const uploadFile = async (req: IRequest, res: Response) => {
 
     const extension = file.mimetype.split("/")[1];
 
-    const file_name = `${getFileNameWithoutExtension(filename)}.${extension}`;
+    const file_name = filename
+      ? `${generateRandomKey(6)}-${getFileNameWithoutExtension(
+          filename
+        )}.${extension}`
+      : `${generateRandomKey(32)}-${generateRandomKey(6)}.${extension}`;
 
     try {
       const filePath = await uploadFileToS3(
