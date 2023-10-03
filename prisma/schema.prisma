@@ -8,56 +8,50 @@ datasource db {
 }
 
 model user {
-  id             Int       @id @unique @default(autoincrement())
-  uuid           String    @unique @default(uuid())
-  name           String?   @default("")
-  email          String    @unique
-  username       String    @unique
-  password       String?   @default("")
+  id             String         @id @default(uuid())
+  name           String?        @default("")
+  email          String         @unique
+  username       String         @unique
+  password       String?
   otp            String?
   otp_expiry     DateTime?
-  email_verified Boolean   @default(false)
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
+  email_verified Boolean        @default(false)
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
   auth_method    String?
   github_id      Int?
+  emailResets    emailReset[]
+  fly            fly[]
+  refresh_token  refreshToken[]
 }
 
 model emailReset {
-  id          Int      @id @unique @default(autoincrement())
-  uuid        String   @unique @default(uuid())
+  id          String   @id @default(uuid())
+  user        user     @relation(fields: [user_id], references: [id])
   user_id     String
   email       String
   created_at  DateTime @default(now())
-  is_verified Boolean @default(false)
+  is_verified Boolean  @default(false)
 }
 
 model fly {
-  id           Int      @id @unique @default(autoincrement())
-  uuid         String   @unique @default(uuid())
+  id           String   @id @default(uuid())
+  user         user     @relation(fields: [user_id], references: [id])
   user_id      String
   storage      BigInt   @default(2000000000)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   used_storage BigInt   @default(0)
-  name         String
+  project_url  String
   public_key   String
-  project_url  String?
-}
-
-model folder {
-  id               Int      @id @unique @default(autoincrement())
-  uuid             String   @unique @default(uuid())
-  name             String
-  parent_folder_id String   @default("")
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
-  fly_id           String
+  name         String
+  files        file[]
+  apikeys      apikey[]
+  logs         log[]
 }
 
 model file {
-  id               Int      @id @unique @default(autoincrement())
-  uuid             String   @unique @default(uuid())
+  id               String   @id @default(uuid())
   name             String
   url              String
   parent_folder_id String
@@ -67,17 +61,18 @@ model file {
   uploaded_via     String
   size             BigInt
   path             String
+  fly              fly      @relation(fields: [fly_id], references: [id])
   fly_id           String
   date             String
 }
 
 model apikey {
-  id         Int               @id @unique() @default(autoincrement())
-  uuid       String            @unique() @default(uuid())
+  id         String            @id @default(uuid())
   created_at DateTime          @default(now())
   updated_at DateTime          @updatedAt
   active     Boolean           @default(true)
   user_id    String
+  fly        fly               @relation(fields: [fly_id], references: [id])
   fly_id     String
   permission apikey_permission
   key        String            @unique()
@@ -85,8 +80,7 @@ model apikey {
 }
 
 model log {
-  id            Int        @id @unique() @default(autoincrement())
-  uuid          String     @unique @default(uuid())
+  id            String     @id @default(uuid())
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
   method        log_method
@@ -95,6 +89,7 @@ model log {
   response_body Json
   request_body  Json
   date          String
+  fly           fly        @relation(fields: [fly_id], references: [id])
   fly_id        String     @default("")
   ip_address    String     @default("0.0.0.0")
 }
@@ -106,9 +101,10 @@ enum log_method {
 }
 
 model refreshToken {
-  id         Int      @id @unique() @default(autoincrement())
+  id         String   @id @default(uuid())
   created_at DateTime @default(now())
-  user_id    String   @unique
+  user       user     @relation(fields: [user_id], references: [id])
+  user_id    String
   token      String   @db.LongText
   expires_at DateTime
 }
