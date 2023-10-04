@@ -5,49 +5,36 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model user {
-  id             String         @id @default(uuid())
-  name           String?        @default("")
-  email          String         @unique
-  username       String         @unique
+  id             String    @id @default(uuid())
+  name           String?   @default("")
+  email          String    @unique
+  username       String    @unique
   password       String?
   otp            String?
   otp_expiry     DateTime?
-  email_verified Boolean        @default(false)
-  created_at     DateTime       @default(now())
-  updated_at     DateTime       @updatedAt
+  email_verified Boolean   @default(false)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
   auth_method    String?
   github_id      Int?
-  emailResets    emailReset[]
-  fly            fly[]
-  refresh_token  refreshToken[]
-}
-
-model emailReset {
-  id          String   @id @default(uuid())
-  user        user     @relation(fields: [user_id], references: [id])
-  user_id     String
-  email       String
-  created_at  DateTime @default(now())
-  is_verified Boolean  @default(false)
 }
 
 model fly {
   id           String   @id @default(uuid())
-  user         user     @relation(fields: [user_id], references: [id])
   user_id      String
   storage      BigInt   @default(2000000000)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   used_storage BigInt   @default(0)
-  project_url  String
-  public_key   String
   name         String
-  files        file[]
-  apikeys      apikey[]
-  logs         log[]
+  public_key   String
+  project_url  String
+
+  @@index([user_id])
 }
 
 model file {
@@ -61,9 +48,10 @@ model file {
   uploaded_via     String
   size             BigInt
   path             String
-  fly              fly      @relation(fields: [fly_id], references: [id])
   fly_id           String
   date             String
+
+  @@index([fly_id])
 }
 
 model apikey {
@@ -72,11 +60,12 @@ model apikey {
   updated_at DateTime          @updatedAt
   active     Boolean           @default(true)
   user_id    String
-  fly        fly               @relation(fields: [fly_id], references: [id])
   fly_id     String
   permission apikey_permission
-  key        String            @unique()
+  key        String            @unique
   name       String
+
+  @@index([fly_id])
 }
 
 model log {
@@ -89,24 +78,34 @@ model log {
   response_body Json
   request_body  Json
   date          String
-  fly           fly        @relation(fields: [fly_id], references: [id])
   fly_id        String     @default("")
   ip_address    String     @default("0.0.0.0")
+
+  @@index([fly_id])
+}
+
+model emailreset {
+  id          String   @id
+  user_id     String
+  email       String
+  created_at  DateTime @default(now())
+  is_verified Boolean  @default(false)
+
+  @@index([user_id], map: "emailReset_user_id_idx")
+}
+
+model refreshtoken {
+  id         String   @id
+  created_at DateTime @default(now())
+  user_id    String   @unique(map: "refreshToken_user_id_key")
+  token      String   @db.LongText
+  expires_at DateTime
 }
 
 enum log_method {
   post
   get
   delete
-}
-
-model refreshToken {
-  id         String   @id @default(uuid())
-  created_at DateTime @default(now())
-  user       user     @relation(fields: [user_id], references: [id])
-  user_id    String
-  token      String   @db.LongText
-  expires_at DateTime
 }
 
 enum apikey_permission {
