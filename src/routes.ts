@@ -34,4 +34,4 @@ router.delete(
   deleteFolder
 );
 
-export { router as uploadRouter };
+export { router as ufRouter };
