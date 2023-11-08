@@ -18,7 +18,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-const logDrop = record(process.env.LOGDROP_API_KEY!);
+const logDrop = record(process.env.LOGDROP_API_KEY!, {
+  exclude: "/",
+});
 
 app.use(logDrop);
 
