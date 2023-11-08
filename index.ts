@@ -4,7 +4,6 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import { ufRouter } from "./src/routes";
 import { record } from "@logdrop/node";
-import { authenticateApiKey } from "./src/middlewares/authenticateApiKey";
 
 const app = express();
 
