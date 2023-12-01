@@ -29,8 +29,4 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/", ufRouter);
 
-const PORT = process.env.PORT || 2001;
-
-app.listen(PORT, () => {
-  console.log("Live!");
-});
+export { app };
