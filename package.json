@@ -6,13 +6,15 @@
   "scripts": {
     "start": "node ./dist/index.js",
     "dev": "nodemon index.ts",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "test": "jest --testPattern='__tests__/**/*.test.ts'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@babel/preset-env": "^7.23.5",
+    "@types/jest": "^29.5.10",
     "@types/mime-types": "^2.1.2",
     "@types/multer": "^1.4.7",
     "@types/node": "^18.15.3",
