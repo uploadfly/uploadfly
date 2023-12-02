@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import { ufRouter } from "./src/routes";
 import { record } from "@logdrop/node";
+import { isProd } from "./constants";
 
 const app = express();
 
@@ -21,7 +22,7 @@ const logDrop = record(process.env.LOGDROP_API_KEY!, {
   exclude: "/",
 });
 
-app.use(logDrop);
+isProd && app.use(logDrop);
 
 app.get("/", (req: Request, res: Response) => {
   res.redirect("https://uploadfly.co");
