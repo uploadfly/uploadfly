@@ -8,6 +8,7 @@ import { getFileExtension } from "../../utils/getFilename";
 import { uploadFileToS3 } from "../../utils/uploadToS3";
 import { sendError, sendResponse } from "../../utils/resolveRequest";
 import { generateRandomKey } from "../../utils/generateRandomKey";
+import { getFileNameWithoutExtension } from "../../utils/getFileNameWithoutExtension";
 
 const uploadFile = async (req: IRequest, res: Response) => {
   const err = (message: string, status: number) => {
@@ -96,18 +97,6 @@ const uploadFile = async (req: IRequest, res: Response) => {
 
     if (flyUsedStorage + fileSize > flyStorage) {
       return err("Storage limit exceeded", 403);
-    }
-
-    function getFileNameWithoutExtension(filename: string): string {
-      const lastDotIndex = filename.lastIndexOf(".");
-
-      if (lastDotIndex <= 0) {
-        return filename;
-      }
-
-      const filenameWithoutExtension = filename.substring(0, lastDotIndex);
-
-      return filenameWithoutExtension;
     }
 
     const extension = file.mimetype.split("/")[1];
