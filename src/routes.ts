@@ -4,6 +4,7 @@ import { uploadFile } from "./controllers/upload";
 import { deleteFile } from "./controllers/delete";
 import { deleteFolder } from "./controllers/delete/all";
 import { authenticateApiKey } from "./middlewares/authenticateApiKey";
+import { uploadImage } from "./controllers/image/upload";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -15,7 +16,6 @@ router.post(
   (req: Request, res: Response, next: NextFunction) =>
     authenticateApiKey(req, res, next, "/upload"),
   upload.single("file"),
-
   uploadFile
 );
 
@@ -32,6 +32,14 @@ router.delete(
     authenticateApiKey(req, res, next, "/delete/all"),
 
   deleteFolder
+);
+
+router.post(
+  "/image/upload",
+  (req: Request, res: Response, next: NextFunction) =>
+    authenticateApiKey(req, res, next, "/image/upload"),
+  upload.single("file"),
+  uploadImage
 );
 
 export { router as ufRouter };
