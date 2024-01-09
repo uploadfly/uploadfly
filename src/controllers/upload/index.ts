@@ -35,6 +35,27 @@ const uploadFile = async (req: IRequest, res: Response) => {
       return err("No API key provided", 400);
     }
 
+    const fly = await prisma.fly.findUnique({
+      where: {
+        id: apiKey?.fly_id,
+      },
+    });
+
+    if (fly?.paused) {
+      return err(
+        "Project is paused, please unpause your subscription to upload.",
+        400
+      );
+    }
+    const fileSize = file.size;
+
+    if (fly?.plan === "free" && fileSize > 100000000) {
+      return err("File size cannot exceed 100MB", 400);
+    }
+
+    if (fly?.plan === "pro" && fileSize > 5000000000) {
+      return err("File size cannot exceed 5GB", 400);
+    }
     const arrayBuffer = Buffer.from(file.buffer);
 
     const {
@@ -44,7 +65,6 @@ const uploadFile = async (req: IRequest, res: Response) => {
     }: { filename: string; maxFileSize: string; allowedFileTypes: string } =
       req.body;
 
-    const fileSize = file.size;
     let parsedFileSize;
 
     if (maxFileSize) {
@@ -58,16 +78,6 @@ const uploadFile = async (req: IRequest, res: Response) => {
     if (fileSize > parsedFileSize?.result!) {
       return err(`File size cannot excceed ${maxFileSize.toUpperCase()}`, 400);
     }
-
-    if (fileSize > 300000000) {
-      return err("File size cannot exceed 300MB", 400);
-    }
-
-    const fly = await prisma.fly.findUnique({
-      where: {
-        id: apiKey?.fly_id,
-      },
-    });
 
     let allowedFileTypesToArray;
 
