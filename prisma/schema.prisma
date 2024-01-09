@@ -24,6 +24,7 @@ model user {
   emailResets    emailReset[]
   fly            fly[]
   refresh_token  refreshToken[]
+  lemon_customer_id String?
 }
 
 model emailReset {
@@ -47,10 +48,14 @@ model fly {
   used_storage BigInt   @default(0)
   project_url  String
   public_key   String
+  plan         project_plan @default(free)
   name         String
   files        file[]
   apikeys      apikey[]
   logs         log[]
+  customDomains customDomain[]
+  paused        Boolean @default(false)
+  paused_at     DateTime?
 
   @@index([user_id])
 }
@@ -69,6 +74,17 @@ model file {
   fly              fly      @relation(fields: [fly_id], references: [id])
   fly_id           String
   date             String
+
+  @@index([fly_id])
+}
+
+model customDomain {
+  id         String            @id @default(uuid())
+  created_at DateTime          @default(now())
+  fly        fly               @relation(fields: [fly_id], references: [id])
+  fly_id     String            @unique()
+  domain     String            @unique()
+  certificateArn String
 
   @@index([fly_id])
 }
@@ -123,4 +139,9 @@ model refreshToken {
 enum apikey_permission {
   upload
   full
+}
+
+enum project_plan {
+  free
+  pro
 }
