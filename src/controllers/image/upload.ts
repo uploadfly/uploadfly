@@ -5,9 +5,10 @@ import { uploadFileToS3 } from "../../utils/uploadToS3";
 import prisma from "../../../prisma";
 import { generateRandomKey } from "../../utils/generateRandomKey";
 import { getFileNameWithoutExtension } from "../../utils/getFileNameWithoutExtension";
-import sharp from "sharp";
+import sharp, { Metadata } from "sharp";
 import dayjs from "dayjs";
 import filesize from "file-size";
+import { encode } from "blurhash";
 
 export const uploadImage = async (req: IRequest, res: Response) => {
   const err = (message: string, status: number) => {
@@ -23,6 +24,7 @@ export const uploadImage = async (req: IRequest, res: Response) => {
       status,
     });
   };
+
   try {
     if (!req.file) {
       return err("No file provided", 400);
@@ -40,12 +42,14 @@ export const uploadImage = async (req: IRequest, res: Response) => {
       maxFileSize,
       width,
       height,
+      generateBlurHash,
     }: {
       filename: string;
       maxFileSize: string;
       allowedFileTypes: string;
       width: number;
       height: number;
+      generateBlurHash: boolean;
     } = req.body;
 
     let sharpInstance = sharp(arrayBuffer);
@@ -58,7 +62,38 @@ export const uploadImage = async (req: IRequest, res: Response) => {
       });
     }
 
+    const { width: resizedWidth, height: resizedHeight } =
+      await sharpInstance.metadata();
+
     const resizedBuffer = await sharpInstance.toBuffer();
+
+    const generateBlurHashCode = async (
+      imageBuffer: Buffer,
+      width: number,
+      height: number
+    ): Promise<string> => {
+      // Convert Uint8Array to Uint8ClampedArray
+      const clampedArray = new Uint8ClampedArray(imageBuffer);
+
+      // Use sharp to get the actual dimensions of the resized image
+      const sharpInstance = sharp(imageBuffer);
+      const metadata: Metadata = await sharpInstance.metadata();
+      const actualWidth = metadata.width || 0;
+      const actualHeight = metadata.height || 0;
+
+      // Check if the provided dimensions match the actual dimensions
+      if (width !== actualWidth || height !== actualHeight) {
+        throw new Error("Width and height must match the actual dimensions");
+      }
+
+      // Use blurhash library to generate BlurHash from image data
+      return encode(clampedArray, actualWidth, actualHeight, 4, 4);
+    };
+
+    // Generate BlurHash
+    const blurhash = generateBlurHash
+      ? await generateBlurHashCode(resizedBuffer, resizedWidth!, resizedHeight!)
+      : undefined;
 
     const fly = await prisma.fly.findUnique({
       where: {
@@ -101,16 +136,28 @@ export const uploadImage = async (req: IRequest, res: Response) => {
       },
     });
 
+    interface ResponseDataProps {
+      url: string;
+      path: string;
+      type: string;
+      size: string;
+      name: string;
+      blurhash?: string;
+    }
+
+    const responseData: ResponseDataProps = {
+      url: newFile?.url,
+      path: newFile?.path,
+      type: newFile?.type,
+      size: filesize(fileSize).human("si"),
+      name: newFile?.name,
+      blurhash,
+    };
+
     sendResponse({
       res,
       req,
-      data: {
-        url: newFile?.url,
-        path: newFile?.path,
-        type: newFile?.type,
-        size: filesize(fileSize).human("si"),
-        name: newFile?.name,
-      },
+      data: responseData,
       status: 201,
       endpoint: "/upload",
       method: "post",
@@ -121,3 +168,5 @@ export const uploadImage = async (req: IRequest, res: Response) => {
     err("File upload failed", 500);
   }
 };
+
+// Function to generate BlurHash from image data

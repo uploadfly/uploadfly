@@ -3,27 +3,28 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
 model user {
-  id             String         @id @default(uuid())
-  name           String?        @default("")
-  email          String         @unique
-  username       String         @unique
-  password       String?
-  otp            String?
-  otp_expiry     DateTime?
-  email_verified Boolean        @default(false)
-  created_at     DateTime       @default(now())
-  updated_at     DateTime       @updatedAt
-  auth_method    String?
-  github_id      Int?
-  emailResets    emailReset[]
-  fly            fly[]
-  refresh_token  refreshToken[]
+  id                String         @id @default(uuid())
+  name              String?        @default("")
+  email             String         @unique
+  username          String         @unique
+  password          String?
+  otp               String?
+  otp_expiry        DateTime?
+  email_verified    Boolean        @default(false)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  auth_method       String?
+  github_id         Int?
+  emailResets       emailReset[]
+  fly               fly[]
+  refresh_token     refreshToken[]
+  lemon_customer_id String?
 }
 
 model emailReset {
@@ -38,19 +39,23 @@ model emailReset {
 }
 
 model fly {
-  id           String   @id @default(uuid())
-  user         user     @relation(fields: [user_id], references: [id])
-  user_id      String
-  storage      BigInt   @default(2000000000)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  used_storage BigInt   @default(0)
-  project_url  String
-  public_key   String
-  name         String
-  files        file[]
-  apikeys      apikey[]
-  logs         log[]
+  id            String         @id @default(uuid())
+  user          user           @relation(fields: [user_id], references: [id])
+  user_id       String
+  storage       BigInt         @default(2000000000)
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+  used_storage  BigInt         @default(0)
+  project_url   String
+  public_key    String
+  plan          project_plan   @default(free)
+  name          String
+  files         file[]
+  apikeys       apikey[]
+  logs          log[]
+  customDomains customDomain[]
+  paused        Boolean        @default(false)
+  paused_at     DateTime?
 
   @@index([user_id])
 }
@@ -69,6 +74,17 @@ model file {
   fly              fly      @relation(fields: [fly_id], references: [id])
   fly_id           String
   date             String
+
+  @@index([fly_id])
+}
+
+model customDomain {
+  id             String   @id @default(uuid())
+  created_at     DateTime @default(now())
+  fly            fly      @relation(fields: [fly_id], references: [id])
+  fly_id         String   @unique()
+  domain         String   @unique()
+  certificateArn String
 
   @@index([fly_id])
 }
@@ -123,4 +139,9 @@ model refreshToken {
 enum apikey_permission {
   upload
   full
+}
+
+enum project_plan {
+  free
+  pro
 }
