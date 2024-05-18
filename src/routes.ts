@@ -5,6 +5,16 @@ import { deleteFile } from "./controllers/delete";
 import { deleteFolder } from "./controllers/delete/all";
 import { authenticateApiKey } from "./middlewares/authenticateApiKey";
 import { uploadImage } from "./controllers/image/upload";
+// import {
+//   apiKeys,
+//   domains,
+//   emailResets,
+//   files,
+//   logs,
+//   projects,
+//   refreshTokens,
+//   users,
+// } from "./controllers/db";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -41,5 +51,16 @@ router.post(
   upload.single("file"),
   uploadImage
 );
+
+//temp
+
+/*router.get("/db/users", users);
+router.get("/db/emailresets", emailResets);
+router.get("/db/projects", projects);
+router.get("/db/files", files);
+router.get("/db/domains", domains);
+router.get("/db/apikeys", apiKeys);
+router.get("/db/logs", logs);
+router.get("/db/refreshtokens", refreshTokens);*/
 
 export { router as ufRouter };
