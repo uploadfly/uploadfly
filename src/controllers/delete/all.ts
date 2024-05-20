@@ -121,8 +121,7 @@ const deleteFolder = async (req: IRequest, res: Response) => {
         });
       })
       .catch((err) => {
-        console.log("Something went wrong");
-
+        console.log(err);
         res.status(500).json({
           message: "Something went wrong",
           error: err,
