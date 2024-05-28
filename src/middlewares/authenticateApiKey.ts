@@ -46,6 +46,19 @@ const authenticateApiKey = async (
       return err("API key has been deactivated.", 401);
     }
 
+    const project = await prisma.fly.findUnique({
+      where: {
+        id: key.fly_id,
+      },
+    });
+
+    if (project?.plan === "free") {
+      return err(
+        "Free plan has been discontinued. Upgrade to a paid plan to continue.",
+        403
+      );
+    }
+
     req.apiKey = key;
 
     next();
