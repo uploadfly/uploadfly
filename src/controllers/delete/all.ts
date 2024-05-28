@@ -99,7 +99,15 @@ const deleteFolder = async (req: IRequest, res: Response) => {
     };
 
     deleteFolder(fly.public_key)
-      .then(() => {
+      .then(async () => {
+        await prisma.fly.update({
+          where: {
+            id: fly.id,
+          },
+          data: {
+            used_storage: 0,
+          },
+        });
         sendResponse({
           res,
           req,
@@ -113,8 +121,7 @@ const deleteFolder = async (req: IRequest, res: Response) => {
         });
       })
       .catch((err) => {
-        console.log("Something went wrong");
-
+        console.log(err);
         res.status(500).json({
           message: "Something went wrong",
           error: err,
