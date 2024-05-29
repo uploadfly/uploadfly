@@ -2,6 +2,7 @@ import { Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { IRequest } from "../interfaces";
 import { sendError } from "../utils/resolveRequest";
+import dayjs from "dayjs";
 
 const prisma = new PrismaClient();
 
@@ -52,12 +53,18 @@ const authenticateApiKey = async (
       },
     });
 
-    if (project?.plan === "free") {
+    if (project?.plan === "free" && dayjs(new Date()).isAfter("2024-06-04")) {
       return err(
         "Free plan has been discontinued. Upgrade to a paid plan to continue.",
         403
       );
     }
+    // if (project?.plan === "free") {
+    //   return err(
+    //     "Free plan has been discontinued. Upgrade to a paid plan to continue.",
+    //     403
+    //   );
+    // }
 
     req.apiKey = key;
 
