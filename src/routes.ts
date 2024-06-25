@@ -5,6 +5,7 @@ import { deleteFile } from "./controllers/delete";
 import { deleteFolder } from "./controllers/delete/all";
 import { authenticateApiKey } from "./middlewares/authenticateApiKey";
 import { uploadImage } from "./controllers/image/upload";
+import { uploadBulkFiles } from "./controllers/upload/bulk";
 // import {
 //   apiKeys,
 //   domains,
@@ -27,6 +28,14 @@ router.post(
     authenticateApiKey(req, res, next, "/upload"),
   upload.single("file"),
   uploadFile
+);
+
+router.post(
+  "/upload/bulk",
+  (req: Request, res: Response, next: NextFunction) =>
+    authenticateApiKey(req, res, next, "/upload/bulk"),
+  upload.array("files"),
+  uploadBulkFiles
 );
 
 router.delete(
